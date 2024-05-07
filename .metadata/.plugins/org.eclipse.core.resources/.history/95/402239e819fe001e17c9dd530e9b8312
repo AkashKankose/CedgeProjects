@@ -1,0 +1,42 @@
+package cedge.apis.cedgedebitcardapi.controller;
+
+import cedge.apis.cedgedebitcardapi.controller.MandateVerifyController;
+import cedge.apis.cedgedebitcardapi.models.req.MandateVerifyReqModel;
+import cedge.apis.cedgedebitcardapi.models.res.Response;
+import cedge.apis.cedgedebitcardapi.services.MandateServiceDebit;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class VerifyCard {
+  @Autowired
+  MandateServiceDebit mndtService;
+  
+  static Logger log = Logger.getLogger(MandateVerifyController.class);
+  
+  @PostMapping(value = {"/verifycard/{bankname}"}, consumes = {"application/json"})
+  public ResponseEntity<Response> verifyMandate(@RequestBody MandateVerifyReqModel reqModel, @PathVariable String bankname) {
+    Response response = null;
+    try {
+      log.info("REQ:" + bankname);
+      log.info("ENCODED XML:" + reqModel.getMandateAuthDtls().getMandateRequestDtl().getMandateReqDoc());
+      log.info("card No:" + reqModel.getMandateAuthDtls().getCardInfo().getCardNo());
+      log.info("CVV:" + reqModel.getMandateAuthDtls().getCardInfo().getCvv());
+      log.info("EXP:" + reqModel.getMandateAuthDtls().getCardInfo().getExpiry());
+      log.info("CHECKSUM:" + reqModel.getMandateAuthDtls().getMandateRequestDtl().getCheckSumVal());
+      response = this.mndtService.processMandateRequest(reqModel, bankname);
+      log.info("RES:" + bankname);
+    } catch (Exception e) {
+      log.error(e);
+    } 
+    return new ResponseEntity(response, (MultiValueMap)new HttpHeaders(), HttpStatus.OK);
+  }
+}

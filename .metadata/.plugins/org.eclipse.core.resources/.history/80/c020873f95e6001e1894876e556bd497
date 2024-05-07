@@ -1,0 +1,73 @@
+package com.PanCard.ema.Controller;
+
+//import javax.validation.Valid;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.PanCard.ema.DbEntity.eman_panconfig;
+import com.PanCard.ema.Model.ReqFromNPCI;
+import com.PanCard.ema.Service.PanService;
+
+import jakarta.validation.Valid;
+
+@RestController
+public class PanVerifyController {
+
+	private final static Logger log = Logger.getLogger(PanVerifyController.class);
+
+	@Autowired
+	private PanService ser;
+	
+	@PostMapping(value = "verifyPanCard/{bankname}")
+	public ResponseEntity<Object> verifyPanCard(@Valid @RequestBody ReqFromNPCI request,
+			                             @PathVariable String bankname ,BindingResult bindingResult ) throws Exception {
+		log.info("inside verifyPanCard method...");
+//		Response res = null;
+
+		if (bindingResult.hasErrors()) {
+	        throw new IllegalArgumentException("Invalid request parameters...");
+	    }
+		log.info("Recieved Request..");
+		log.info("Transaction Id >>"+ request.getMandateAuthDtls().getTransactionID());
+		log.info("Encrypted and encoded mandateRequestDoc >>"+request.getMandateAuthDtls().getMandateRequestDtl().getMandateReqDoc());
+		log.info("Auth Mode >>"+request.getMandateAuthDtls().getAuthMode());
+		log.info("Pan Number Encrypted >>"+request.getMandateAuthDtls().getPanInfo().getPan());
+		
+		 ResponseEntity<Object> responseEntity;
+	        try {
+	            responseEntity = ser.processRequest();
+	        } catch (Exception e) {
+	            log.error("Exception occurred..." + e);
+	            return new ResponseEntity<>("Error processing the request", HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+
+	        HttpHeaders responseHeaders = new HttpHeaders();
+	        responseHeaders.set("Response from bank", bankname);
+
+	        return ResponseEntity.status(responseEntity.getStatusCode()).headers(responseHeaders)
+	                .body(responseEntity.getBody());
+	}
+	
+	@PostMapping("/save")
+	public eman_panconfig saveController( @RequestBody eman_panconfig eman)
+	{
+		System.out.println("Data="+eman.getBANKCODE());
+		return ser.saveService(eman);
+	}
+//	
+	@GetMapping("/find/{bankcode}")
+	public eman_panconfig findBYBankcode(@PathVariable String bankcode)
+	{
+		return ser.findByBankcode(bankcode);
+	}
+}

@@ -1,0 +1,62 @@
+package cedge.apis.cedgedebitcardapi.controller;
+
+
+import cedge.apis.cedgedebitcardapi.config.DataBaseMaster;
+import cedge.apis.cedgedebitcardapi.dao.OtpDao;
+import cedge.apis.cedgedebitcardapi.dao.mandateDao;
+import cedge.apis.cedgedebitcardapi.models.EmandBankDetails;
+import cedge.apis.cedgedebitcardapi.models.SMSModel;
+import cedge.apis.cedgedebitcardapi.models.req.ResendOtp;
+import cedge.apis.cedgedebitcardapi.models.req.ResendOtpReqModel;
+import cedge.apis.cedgedebitcardapi.models.res.Response;
+import cedge.apis.cedgedebitcardapi.services.SMSService;
+import java.sql.Connection;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ResendOTP {
+  @Autowired
+  SMSService smsService;
+  
+ private static final Logger log = Logger.getLogger(cedge.apis.cedgedebitcardapi.controller.ResendOTP.class);
+  
+  @PostMapping(value = {"/resendotp/{bankname}"}, consumes = {"application/json"})
+  public ResponseEntity<Response> ResendOtp(@RequestBody ResendOtpReqModel resendOTP, @PathVariable String bankname) {
+    mandateDao mdtdao = new mandateDao();
+    SMSModel smsModel = new SMSModel();
+    Connection conn = DataBaseMaster.getConnection(bankname);
+    try {
+      EmandBankDetails ebd = mandateDao.getEmanBankdetails(bankname, conn);
+      OtpDao o = new OtpDao();
+      ResendOtp resendotp = o.getMob(bankname, resendOTP.getDebitAuthDtls().getTransactionID());
+      if (resendotp.getCount() <= 3) {
+        String otp = this.smsService.sendSMS(resendotp.getMob(), ebd);
+        smsModel.setMobileNumber(resendotp.getMob());
+        smsModel.setOtp(otp);
+        smsModel.setTransactionId(resendOTP.getDebitAuthDtls().getTransactionID());
+        o.updateOTP(bankname, smsModel);
+        int cnt = resendotp.getCount();
+        cnt++;
+        mdtdao.updateOTPcount(bankname, smsModel, cnt);
+      } else {
+        smsModel.setMobileNumber(resendotp.getMob());
+        smsModel.setOtp("Max otp");
+        smsModel.setTransactionId(resendOTP.getDebitAuthDtls().getTransactionID());
+        o.updateOTP(bankname, smsModel);
+        this.log.info("MAX OTP:" + resendOTP.getDebitAuthDtls().getTransactionID());
+      } 
+    } catch (Exception e) {
+      e.printStackTrace();
+    } 
+    return new ResponseEntity<Response>(smsModel, new HttpHeaders(), HttpStatus.OK);
+  }
+}

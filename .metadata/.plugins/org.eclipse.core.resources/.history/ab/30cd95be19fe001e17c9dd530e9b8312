@@ -1,0 +1,32 @@
+package cedge.apis.cedgedebitcardapi.controller;
+
+import cedge.apis.cedgedebitcardapi.models.customerMDT;
+import cedge.apis.cedgedebitcardapi.models.req.Card;
+import cedge.apis.cedgedebitcardapi.models.req.CardInfo;
+import cedge.apis.cedgedebitcardapi.models.req.ReaponseBean;
+import cedge.apis.cedgedebitcardapi.services.CardService;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ExtSwitchVerifyController {
+  @Autowired
+  CardService cardservice;
+  
+  static Logger log = Logger.getLogger(CardService.class);
+  
+  @PostMapping(value = {"/reqtoextswitch"}, consumes = {"application/json"})
+  public String readDataFromApp(@RequestBody Card atmreq) {
+    customerMDT cust = null;
+    CardInfo crdinfo = new CardInfo();
+    crdinfo.setCardNo(atmreq.getCardno());
+    crdinfo.setCvv(atmreq.getCvv());
+    crdinfo.setExpiry(atmreq.getExpirydt());
+    crdinfo.setAccountNumber(atmreq.getAccno());
+    ReaponseBean resp = this.cardservice.ExtverifyCard(crdinfo, atmreq.getBankname(), atmreq.getIp(), atmreq.getPort(), cust, atmreq.getAccno());
+    return resp.getVerifycard();
+  }
+}

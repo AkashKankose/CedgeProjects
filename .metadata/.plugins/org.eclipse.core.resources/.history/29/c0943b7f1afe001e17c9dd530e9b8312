@@ -1,0 +1,132 @@
+package cedge.apis.cedgedebitcardapi.controller;
+
+import cedge.apis.cedgedebitcardapi.models.AccStatus;
+import cedge.apis.cedgedebitcardapi.models.EmandBankDetails;
+//import cedge.apis.cedgedebitcardapi.models.res.Response;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.apache.log4j.Logger;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CBSCheck {
+  private static final Logger logger = Logger.getLogger(cedge.apis.cedgedebitcardapi.controller.CBSCheck.class);
+  
+  @GetMapping(value = {"/reqcbs"}, consumes = {"application/json"})
+  public String getAccStatus(@RequestParam String accNO) {
+//    String dbtaccno = "";
+//    Response response = null;
+    EmandBankDetails ebd = new EmandBankDetails();
+    ebd.setCBSDBIP("172.32.32.27");
+    ebd.setCBSDBPORT("1521");
+    ebd.setCBSSID("r013bans");
+    ebd.setCBSUSERNAME("EM_ARGB");
+    ebd.setCBSPASS("EM_ARGB");
+    Connection conn = null;
+    PreparedStatement pst1 = null;
+    ResultSet rs4 = null;
+    AccStatus st = new AccStatus();
+    String cudebtacc = accNO;
+    String custacc = cudebtacc.substring(0, cudebtacc.length() - 1);
+    try {
+      try {
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } 
+      conn = DriverManager.getConnection("jdbc:oracle:thin:@" + ebd
+          .getCBSDBIP() + ":" + ebd.getCBSDBPORT() + ":" + ebd.getCBSSID(), ebd
+          .getCBSUSERNAME(), ebd.getCBSPASS());
+      String q = "SELECT LTRIM(SUBSTR(KEY_1,4,16),0) AS ACCOUNT_NO,CURR_STATUS,CASE WHEN ACCT_TYPE LIKE '1%' THEN 'SAVINGS' WHEN ACCT_TYPE LIKE '5%' THEN 'CURRENT' WHEN ACCT_TYPE LIKE '60%' THEN 'CC' ELSE 'OTHER' END AS ACCOUNT_TYPE,MINOR_AC,DEATH_FLAG,NO_OF_HOLDS,ATM_ACCT_FLAG,(SELECT  SUM(ID_POINT_VALUE) FROM CUID,IDTP WHERE CUID.INST_NO='003' AND CUID.INST_NO='003' AND CUID.ID_TYPE = IDTP.ID_TYPE AND CUST_NO = CUSTOMER_NO AND ROWNUM < 2) KYC_POINTS,NVL2((SELECT KEY_1 FROM RELM WHERE RELM.KEY_2 LIKE INVM.KEY_1||'INV0029%' AND ROWNUM < 2 ),'Y','N') JOINT_CIF,(SELECT  LPAD(TRIM(SUBSTR(LPAD(TRIM(TELEX_NO),12,0),-10)),10,0) FROM CUSVAA WHERE INST_NO='003' AND CUSVAA.CUST_NO=INVM.CUSTOMER_NO AND ROWNUM<2 ) MOBILE FROM INVM WHERE KEY_1='003'||SUBSTR(LPAD('" + accNO + "',17,0),1,16)";
+      pst1 = conn.prepareStatement(q);
+      rs4 = pst1.executeQuery();
+      if (rs4.next()) {
+        String cbsacc = rs4.getString("ACCOUNT_NO");
+        if (cbsacc.equals(custacc)) {
+          if (rs4.getString("CURR_STATUS") != null) {
+            st.setAccstatus(rs4.getString("CURR_STATUS"));
+          } else {
+            logger.info("Acc Status not set in cbs");
+            st.setAccstatus("");
+          } 
+          if (rs4.getString("ACCOUNT_TYPE") != null) {
+            st.setAccc_type(rs4.getString("ACCOUNT_TYPE"));
+          } else {
+            logger.info("Account Type is not set in CBS");
+            st.setAccc_type("");
+          } 
+          if (rs4.getString("MINOR_AC") != null) {
+            st.setMinor_flag(rs4.getString("MINOR_AC"));
+          } else {
+            st.setMinor_flag("");
+            logger.info("MINOR AC is not set in CBS");
+          } 
+          if (rs4.getString("DEATH_FLAG") != null) {
+            st.setDeathflag(rs4.getString("DEATH_FLAG"));
+          } else {
+            st.setDeathflag("");
+            logger.info("DEATH FLAG not set in CBS");
+          } 
+          if (rs4.getString("NO_OF_HOLDS") != null) {
+            st.setNo_of_holds(rs4.getString("NO_OF_HOLDS"));
+          } else {
+            st.setNo_of_holds("");
+            logger.info("NO OF HOLD not set in CBS");
+          } 
+          if (rs4.getString("ATM_ACCT_FLAG") != null) {
+            st.setAtmflag(rs4.getString("ATM_ACCT_FLAG"));
+          } else {
+            st.setAtmflag("");
+            logger.info("ATM_ACCT_FLAGnot set in CBS");
+          } 
+          logger.info("KYC POINT:" + rs4.getString("KYC_POINTS"));
+          if (rs4.getString("KYC_POINTS") != null) {
+            st.setKycpoints(rs4.getString("KYC_POINTS"));
+          } else {
+            st.setKycpoints("1");
+            logger.info("KYC PONT not set in CBS");
+          } 
+          if (rs4.getString("JOINT_CIF") != null) {
+            st.setIsjointacc(rs4.getString("JOINT_CIF"));
+          } else {
+            st.setIsjointacc("");
+            logger.info("JOINT ACC not set in CBS");
+          } 
+          if (rs4.getString("MOBILE") != null) {
+            st.setMobile(rs4.getString("MOBILE"));
+          } else {
+            st.setMobile("");
+            logger.info("JOINT ACC not set in CBS");
+          } 
+        } else {
+          st.setAccstatus("ACCNOTFOUND");
+        } 
+      } else {
+        st.setAccstatus("ACCNOTFOUND");
+      } 
+    } catch (SQLException e) {
+      logger.debug("Unable To connect CBS Network issue");
+      st.setCBSconnSTS("N");
+      e.printStackTrace();
+    } finally {
+      if (conn != null)
+        try {
+          conn.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }  
+      if (pst1 != null)
+        try {
+          pst1.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }  
+    } 
+    return st.toString();
+  }
+}
