@@ -1,0 +1,1253 @@
+
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge;IE=11">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>E-nach</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" th:href="@{/bootstrap.min.css}" />
+  <link rel="stylesheet" th:href="@{/main.css}" />
+  <link rel="stylesheet" th:href="@{/font-awesome.min.css}">
+   <!-- new version  -->
+  <script th:src="@{/jquery-3.5.1.min.js}"></script>
+  <script th:src="@{/popper.min.js}"></script>
+  <script th:src="@{/bootstrap.min.js}"></script>
+  <script th:src="@{/main.js}"></script>
+  <link rel="stylesheet" th:href="@{/datepicker.css}" type="text/css" />
+  <script th:src="@{/bootstrap-datepicker.js}"></script>
+  <script th:src="@{/aes.js}" type="text/javascript"></script>
+  <script th:src="@{/pbkdf2.js}"></script>
+  
+<script>
+function validateLoanNo(loanNumber){
+	var flag=false;
+	var proregex= 'HLREGEX';
+	var regex ="";
+	if(proregex.trim()== 'HLREGEX'){
+		regex = /^([a-zA-Z]){5}([0-9]){11}?$/;
+	}else if(proregex.trim() == 'ALPHANUMERIC'){
+		regex = /^[0-9a-zA-Z]+$/;
+	}else if(proregex.trim() == 'NUMERIC'){
+		regex = /^[0-9-+()]*$/;
+	}
+	var loanErrMsg = 'Please enter your loan account number';
+	var maxlength = '16';
+	
+	console.log("Expression from properties = "+regex);
+	var loanNumber = $('#loanAcNo').val();
+	if( loanNumber == ""){
+		$("#lano_errormsg").html(loanErrMsg);
+        $("#lano_errormsg").show();
+        $(".loanno").addClass("error_input");
+	}  else if(!regex.test(loanNumber)) {
+    	$("#lano_errormsg").html(loanErrMsg);
+    	$("#lano_errormsg").show();
+    	$(".loanno").addClass("error_input");
+    }else if(maxlength!='NA' && loanNumber.length > maxlength) {
+    	$("#lano_errormsg").html("Field max length is "+maxlength+" only");
+    	$("#lano_errormsg").show();
+    	$(".loanno").addClass("error_input");
+    }else{
+    	$("#lano_errormsg").hide();
+    	$(".loanno").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+function validateBankName(){
+	var bankName = $("#bankName").val();
+	var flag=false;
+	if(bankName == 'Select Bank' || bankName == ''){
+		console.log("select bank......");
+		$("#bn_errMsg").show();
+		$(".bankName").addClass("error_input");
+	}else{
+		$("#bn_errMsg").hide();
+		flag=true;
+	}
+	return flag;
+}
+
+function validateFreqName(){
+	//alert("method");
+	var freqName = $("#freqName").val();
+	var flag=false;
+	if(freqName == 'Select Frequency' || freqName == ''){
+		console.log("select Frequency......");
+		$("#freq_errMsg").show();
+		$(".freqName").addClass("error_input");
+	}else{
+		$("#freq_errMsg").hide();
+		flag=true;
+	}
+	return flag;
+}
+
+function validateTypeName(){
+	//alert("method");
+	var typeName = $("#typeName").val();
+	var flag=false;
+	if(typeName == 'Select Type' || typeName == ''){
+		console.log("select Collection Type......");
+		$("#type_errMsg").show();
+		$(".typeName").addClass("error_input");
+	}else{
+		$("#type_errMsg").hide();
+		flag=true;
+	}
+	return flag;
+}
+
+function validateAccType(){
+	var payType = $("#acccountType").val();
+	var flag=false;
+	if(payType == 'Select Account Type' || payType == ''){
+		console.log("select Account Type......");
+		$("#accType_errMsg").show();
+		$(".accountType").addClass("error_input");
+	}else{
+		$("#accType_errMsg").hide();
+		flag=true;
+	}
+	return flag;
+}
+
+function validatePayType(){
+	var payType = $("#paymentType").val();
+	var flag=false;
+	if(payType == 'Select Payment Type' || payType == ''){
+		console.log("select Payment Type......");
+		$("#payType_errMsg").show();
+		$(".paymentType").addClass("error_input");
+	}else{
+		$("#payType_errMsg").hide();
+		flag=true;
+	}
+	return flag;
+}
+
+
+
+function validateMaxEmiAmount(){
+	var maxEmiAmount	=	$('#maximumEmiAmount').val();
+	var emiAmount		=	parseInt($("#emiAmount").val());
+	var parseMaxEmiAmount	=	parseInt($("#maximumEmiAmount").val());
+	
+	var maxCollectionAmountRegex	= 'NUMERIC';
+	//var maxCollectionAmountMaximum	= '1000000';
+	var regex;
+	if(maxCollectionAmountRegex.trim() == 'NUMERIC'){
+		regex = /^[0-9-+()]*$/;
+	}else if(maxCollectionAmountRegex.trim() == 'DECIMAL'){
+		regex = /^[0-9]+([.][0-9]{2})?$/g;
+	}
+	var flag=false;
+	
+	//increased amount changes
+	var paymentType = $("#paymentType").val();
+	var maxCollectionAmountMaximum= '1000000';
+	console.log("Selected payment Type is :"+paymentType);
+	if(paymentType=='Debit Card'){
+		maxCollectionAmountMaximum	= '10000000';
+	}else if(paymentType=='Net Banking'){
+		maxCollectionAmountMaximum	= '10000000';
+	}else if(paymentType=='Aadhaar number'){
+		maxCollectionAmountMaximum	= '10000000';
+	}
+	console.log("maxCollectionAmountMaximum :"+maxCollectionAmountMaximum);
+	//ends
+	
+	if( maxEmiAmount == ""){
+		$("#mamt_errMsg").html("Please enter maximum collection amount.");
+        $("#mamt_errMsg").show();
+        $(".maxEmiAmt").addClass("error_input");
+	}
+	else if(!regex.test(maxEmiAmount)){
+    	$("#mamt_errMsg").html("Maximum collection amount should be numeric.");
+    	$("#mamt_errMsg").show();
+    	$(".maxEmiAmt").addClass("error_input");
+    }
+	else if(maxEmiAmount > parseInt(maxCollectionAmountMaximum)){
+	   //	$("#mamt_errMsg").html("e Mandate can be created for less than or equal Rs. 100000");
+	   	//$("#mamt_errMsg").show();
+	   	//$(".maxEmiAmt").addClass("error_input");
+	   	//alert("e Mandate can be created for less than or equal Rs. 1000000");
+	   	alert("e Mandate can be created for less than or equal Rs. "+maxCollectionAmountMaximum);
+	}
+	else if(emiAmount > parseMaxEmiAmount){
+	   	//$("#mamt_errMsg").html("Maximum collection amount should be greater than collection amount.");
+	   	//$("#mamt_errMsg").show();
+	   	//$(".maxEmiAmt").addClass("error_input");
+	   	alert("Maximum collection amount should be greater than collection amount.");
+	}else{
+    	$("#mamt_errMsg").hide();
+    	$(".maxEmiAmt").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+
+function validateName(){
+	var name = $('#name').val();
+	var alphabateswithspace=/^[a-zA-Z\s]+$/;
+	var flag=false;
+	if( name == ""){
+		$("#name_errMsg").html("Please enter your full name.");
+        $("#name_errMsg").show();
+        $(".name").addClass("error_input");
+	} else if(name.length > 50){
+    	$("#name_errMsg").html("Full name allows maximum 50 characters only.");
+    	$("#name_errMsg").show();
+    	$(".name").addClass("error_input");
+    } else if(!alphabateswithspace.test(name)) {
+    	$("#name_errMsg").html("Full name allows alpabates and space only.");
+    	$("#name_errMsg").show();
+    	$(".name").addClass("error_input");
+    } else{
+    	$("#name_errMsg").hide();
+    	$(".name").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+
+function validateEmailId(){
+	var emailId = $('#emailId').val();
+	var emailValidation = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	var flag=false;
+	if(!emailValidation.test(emailId))
+    {
+    	$("#email_errMsg").html("Please enter a valid emailId.");
+    	$("#email_errMsg").show();
+    	$(".email").addClass("error_input");
+    }else{
+    	$("#email_errMsg").html("Please enter your emailId.");
+    	$("#email_errMsg").hide();
+    	$(".email").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+
+function validateMobileNumber(){
+	var mobileNumber = $('#mobileNumber').val();
+	var numsonly=/^[0-9-+()]*$/;
+	var flag=false;
+	if(mobileNumber == ""){
+		$("#mobile_errMsg").html("Please enter your mobile number.");
+		$("#mobile_errMsg").show();
+		$(".mobile").addClass("error_input");
+	}
+	else if(mobileNumber.length < 10)
+	{
+		$("#mobile_errMsg").html("Please enter a valid 10 digit mobile number.");
+		$("#mobile_errMsg").show();
+		$(".mobile").addClass("error_input");
+	}
+	else if(!numsonly.test(mobileNumber))
+    {
+    	$("#mobile_errMsg").html("Mobile number shoud be numeric.");
+    	$("#mobile_errMsg").show();
+    	$(".mobile").addClass("error_input");
+    }
+	else
+	{
+		$("#mobile_errMsg").hide();
+		$(".mobile").removeClass("error_input");
+		flag=true;
+	}
+	return flag;
+}
+
+function validateLoanAmount(){
+	
+	var loanAmount = $('#loanAmount').val();
+	var numsonly=/^[0-9-+()]*$/;
+	var flag=false;
+	if(loanAmount == ""){
+		$("#la_errMsg").html("Please enter your loan amount.");
+		$("#la_errMsg").show();
+		$(".loanAmount").addClass("error_input");
+	}else if(!numsonly.test(loanAmount))
+    {
+    	$("#la_errMsg").html("Loan Amount number shoud be numeric.");
+    	$("#la_errMsg").show();
+    	$(".loanAmount").addClass("error_input");
+    }
+	else
+	{
+		$("#la_errMsg").hide();
+		$(".loanAmount").removeClass("error_input");
+		flag=true;
+	}
+	return flag;
+}
+function validateAccountNO(){
+	var accountNumber = $('#accountNumber').val();
+	var numsonly=/^[0-9-+()]*$/;
+	var flag=false;
+	
+	if(accountNumber == ""){
+		$("#ac_errMsg").html("Please enter your debit account number.");
+		$("#ac_errMsg").show();
+		$(".debitAc").addClass("error_input");
+	}else if(!numsonly.test(accountNumber))  {
+    	$("#ac_errMsg").html("Account number shoud be numeric.");
+    	$("#ac_errMsg").show();
+    	$(".debitAc").addClass("error_input");
+    } else {
+		$("#ac_errMsg").hide();
+		$(".debitAc").removeClass("error_input");
+		flag=true;
+	}
+	return flag;
+}
+
+function validateConfirmACNO(){
+	var confirmAccountNumber = $("#confirmAccountNumber").val();
+	var numsonly=/^[0-9-+()]*$/;
+	var flag=false;
+	if(confirmAccountNumber == ""){
+		$("#cac_errMsg").html("Please enter your confirm account number.");
+		$("#cac_errMsg").show();
+		$(".confirmAc").addClass("error_input");
+	}else if(!numsonly.test(confirmAccountNumber)) {
+    	$("#cac_errMsg").html("Confirm account number shoud be numeric.");
+    	$("#cac_errMsg").show();
+    	$(".confirmAc").addClass("error_input");
+    } else if(confirmAccountNumber != $("#accountNumber").val()){
+    	//$("#cac_errMsg").html("Debit account number and confirm account number shoud be same.");
+    	//$("#cac_errMsg").show();
+    	//$(".confirmAc").addClass("error_input");
+    	alert("Debit account number and confirm account number shoud be same.");
+    	$("#confirmAccountNumber").focus();
+    } else {
+		$("#cac_errMsg").hide();
+		$(".confirmAc").removeClass("error_input");
+		flag=true;
+	}
+	return flag;
+	
+}
+function validateIfscCode(){
+	var ifscCode = $('#ifscCode').val();
+	var numswithalphabate=/^[0-9a-zA-Z]+$/;
+	var flag=false;
+	if( ifscCode == ""){
+		$("#ifsc_errMsg").html("Please enter your ifsc code");
+        $("#ifsc_errMsg").show();
+        $(".ifsc").addClass("error_input");
+	}else if(ifscCode.length < 11){
+    	$("#ifsc_errMsg").html("Please enter a valid 11 digit ifsc code.");
+    	$("#ifsc_errMsg").show();
+    	$(".ifsc").addClass("error_input");
+    }else if(!numswithalphabate.test(ifscCode))
+    {
+    	$("#ifsc_errMsg").html("Ifsc code allows alpabates and numbers only.");
+    	$("#ifsc_errMsg").show();
+    	$(".ifsc").addClass("error_input");
+    }else{
+    	$("#ifsc_errMsg").hide();
+    	$(".ifsc").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+
+function validateEmiAmount(){
+	var emiAmount = $('#emiAmount').val();
+	var collectionAmountRegex	= 'NUMERIC';
+	/* var collectionAmountMaximum	= '1000000';
+	collectionAmountMaximum	=	parseInt(collectionAmountMaximum); */
+	var regex;
+	if(collectionAmountRegex.trim() == 'NUMERIC'){
+		regex = /^[0-9-+()]*$/;
+	}else if(collectionAmountRegex.trim() == 'DECIMAL'){
+		regex = /^[0-9]+([.][0-9]{2})?$/g;
+	}
+	var flag=false;
+	
+	//increased amount changes
+	var paymentType = $("#paymentType").val();
+	var collectionAmountMaximum= '1000000';
+	console.log("Selected payment Type is :"+paymentType);
+	if(paymentType=='Debit Card'){
+		collectionAmountMaximum	= '10000000';
+	}else if(paymentType=='Net Banking'){
+		collectionAmountMaximum	= '10000000';
+	}else if(paymentType=='Aadhaar number'){
+		collectionAmountMaximum	= '10000000';
+	}
+	console.log("collectionAmountMaximum :"+collectionAmountMaximum);
+	//ends
+	
+	if( emiAmount == ""){
+		$("#eamt_errMsg").html("Please enter collection amount.");
+        $("#eamt_errMsg").show();
+        $(".emiAmt").addClass("error_input");
+	}else if(!regex.test(emiAmount)) {
+    	$("#eamt_errMsg").html("Collection amount should be numeric.");
+    	$("#eamt_errMsg").show();
+    	$(".emiAmt").addClass("error_input");
+    }else if(emiAmount > parseInt(collectionAmountMaximum)){
+		$("#eamt_errMsg").html("e Mandate can be created for less than or equal Rs. "+collectionAmountMaximum);
+    	$("#eamt_errMsg").show();
+    	$(".emiAmt").addClass("error_input");
+    }else{
+    	$("#eamt_errMsg").hide();
+    	$(".emiAmt").removeClass("error_input");
+    	flag=true;
+    }
+	return flag;
+}
+
+function validateEmiStartDate(){
+	var emiStartdate = $("#datepicker_first").val();
+	var flag=false;
+	if(emiStartdate == ""){
+		$("#emiStart_errMsg").show();
+		$(".emiStart").addClass("error_input");
+	}else{
+		var date =$("#datepicker_first").val().split("-");
+		var startDate= new Date(date[2], date[1] - 1, date[0]);
+		var edate=$("#datepicker_last").val().split("-");
+		if(edate != ""){
+			var endDate= new Date(edate[2], edate[1] - 1, edate[0]);
+			if(endDate <= startDate){
+				//$("#emiStart_errMsg").html("Collection last date should greater than Collection first date.");
+				//$("#emiStart_errMsg").show();
+				alert("Collection last date should greater than Collection first date.");
+			}else{
+				$("#emiStart_errMsg").hide();
+				$(".emiStart").removeClass("error_input");
+				flag=true;
+			}
+		}else{
+			$("#emiStart_errMsg").hide();
+			$(".emiStart").removeClass("error_input");
+			flag=true;
+			
+		}
+		
+	}
+	return flag;
+}
+
+function validateEmiEndDate(){
+	var emiEndDate = $("#datepicker_last").val();
+	var flag=false;
+	if(emiEndDate == ""){
+		$("#emiend_errMsg").show();
+		$(".emiEnd").addClass("error_input");
+	}else{
+		var date =$("#datepicker_first").val().split("-");
+		var startDate= new Date(date[2], date[1] - 1, date[0]);
+		var edate=$("#datepicker_last").val().split("-");
+		if(edate != ""){
+			var endDate= new Date(edate[2], edate[1] - 1, edate[0]);
+			if(endDate <= startDate){
+				 //$("#emiend_errMsg").html("Collectoin start Date must be earlier than collection end date.");
+					//$("#emiend_errMsg").show(); 
+					alert("Collection start Date must be earlier than collection end date.");
+			}else{
+				$("#emiStart_errMsg").hide();
+				$(".emiStart").removeClass("error_input");
+				$("#emiend_errMsg").hide();
+				$(".emiEnd").removeClass("error_input");
+				flag=true;
+			}
+		}else{
+			$("#emiend_errMsg").hide();
+			$(".emiEnd").removeClass("error_input");
+			flag=true;
+		}
+		
+	}
+	return flag;
+}
+
+function validateTerms(){
+	var flag=false;
+	var terms =$("#chkPassport").is(":checked")
+	if(!terms){
+		$("#terms_errMsg").show();
+	}
+	else{
+		$("#terms_errMsg").hide();
+		flag=true
+	}
+	return flag;
+}
+
+function setBankName(bankName,bankCode){
+	console.log("setBankName called");
+	 $('.bank-select label button').text(bankName);
+	 $("#bankName").val(bankCode);
+     $("#bn_errMsg").hide();
+}
+
+function setPaymentType(paymentKey,paymentValue){
+	console.log("setPaymentType called");
+	 $('.payment-select label button').text(paymentValue);
+	 $("#paymentType").val(paymentKey);
+    $("#payType_errMsg").hide();
+}
+
+function setAccountType(accountKey,accountValue){
+	console.log("setAccountType called");
+	 $('.accountType-select label button').text(accountValue);
+	 $("#acccountType").val(accountKey);
+    $("#accType_errMsg").hide();
+}
+
+function setFreqName(freqName,freqCode){
+	//alert("called");
+	$('.freq-select label button').text(freqName);
+	$("#freqName").val(freqCode);
+    $("#freq_errMsg").hide();
+}
+
+function setTypeName(typeName,typeCode){
+	//alert("called");
+	$('.type-select label button').text(typeName);
+	$("#typeName").val(typeCode);
+    $("#type_errMsg").hide();
+}
+
+function dropdownList(id){
+	var paymentType = $("#paymentType").val();
+	var myIDHid;
+	console.log("Selected payment Type is :"+paymentType);
+	if(paymentType=='' || paymentType=='Net Banking'){
+		myIDHid    =    $('#hidBname').val();
+	}else if (paymentType=='Debit Card'){
+		myIDHid    =    $('#hideDebitBankName').val();
+	}else {
+		myIDHid    =    $('#hideAadharBankName').val();
+	}
+	var myIDSize    =    myIDHid.split(",");
+    var myIDMap    =    [];
+    if(myIDSize.length==1){
+        item    =    myIDSize[0].replace("{","").trim();   
+        item    =    item.replace("}","").trim();
+        myIDMap.push(item);
+    }else{
+        for(var i = 0; i < myIDSize.length ; i++) {
+            var item;
+            if(i==0)          
+                item=myIDSize[i].replace("{","").trim();          
+            else if(i==myIDSize.length-1)          
+                item=myIDSize[i].replace("}","").trim();          
+            else          
+                item=myIDSize[i].trim();
+
+            myIDMap.push(item);
+        }
+    }
+    return myIDMap;
+}
+
+function dropdownPaymentList(id){
+	var myIDHid    =    $('#hidePaymentType').val();
+	var myIDSize    =    myIDHid.split(",");
+    var myIDMap    =    [];
+    if(myIDSize.length==1){
+        item    =    myIDSize[0].replace("{","").trim();   
+        item    =    item.replace("}","").trim();
+        myIDMap.push(item);
+    }else{
+        for(var i = 0; i < myIDSize.length ; i++) {
+            var item;
+            if(i==0)          
+                item=myIDSize[i].replace("{","").trim();          
+            else if(i==myIDSize.length-1)          
+                item=myIDSize[i].replace("}","").trim();          
+            else          
+                item=myIDSize[i].trim();
+
+            myIDMap.push(item);
+        }
+    }
+    return myIDMap;
+}
+
+function dropdownAccountList(id){
+	var myIDHid    =    $('#hideAccountType').val();
+	var myIDSize    =    myIDHid.split(",");
+    var myIDMap    =    [];
+    if(myIDSize.length==1){
+        item    =    myIDSize[0].replace("{","").trim();   
+        item    =    item.replace("}","").trim();
+        myIDMap.push(item);
+    }else{
+        for(var i = 0; i < myIDSize.length ; i++) {
+            var item;
+            if(i==0)          
+                item=myIDSize[i].replace("{","").trim();          
+            else if(i==myIDSize.length-1)          
+                item=myIDSize[i].replace("}","").trim();          
+            else          
+                item=myIDSize[i].trim();
+
+            myIDMap.push(item);
+        }
+    }
+    return myIDMap;
+}
+  
+
+function dropdownListForFreq(id){
+	//alert("called");
+	var myIDHid    =    $('#hidFname').val();
+	var myIDSize    =    myIDHid.split(",");
+    var myIDMap    =    [];
+    if(myIDSize.length==1){
+        item    =    myIDSize[0].replace("{","").trim();   
+        item    =    item.replace("}","").trim();
+        myIDMap.push(item);
+    }else{
+        for(var i = 0; i < myIDSize.length ; i++) {
+            var item;
+            if(i==0)          
+                item=myIDSize[i].replace("{","").trim();          
+            else if(i==myIDSize.length-1)          
+                item=myIDSize[i].replace("}","").trim();          
+            else          
+                item=myIDSize[i].trim();
+
+            myIDMap.push(item);
+        }
+    }
+    return myIDMap;
+}
+
+function dropdownListForType(id){
+	//alert("called");
+	var myIDHid    =    $('#hidTname').val();
+	var myIDSize    =    myIDHid.split(",");
+    var myIDMap    =    [];
+    if(myIDSize.length==1){
+        item    =    myIDSize[0].replace("{","").trim();   
+        item    =    item.replace("}","").trim();
+        myIDMap.push(item);
+    }else{
+        for(var i = 0; i < myIDSize.length ; i++) {
+            var item;
+            if(i==0)          
+                item=myIDSize[i].replace("{","").trim();          
+            else if(i==myIDSize.length-1)          
+                item=myIDSize[i].replace("}","").trim();          
+            else          
+                item=myIDSize[i].trim();
+
+            myIDMap.push(item);
+        }
+    }
+    return myIDMap;
+}
+$(document).ready(function(){
+	var finoneErr		=	'';
+	var startDate 		=	'';
+	var endDate			=	'';
+	var bankName		=	'';
+	var freqName		=	'';
+	var typeName		=	'';
+	var bankCode		=	'';
+	var freqCode		=	'';
+	var typeCode		=	'';
+	var paymentTypeCode	=	'';
+	var accountTypeCode	=	'';
+	$("#aId").text('Loan Account Number');
+	if(bankCode==''){
+		bankCode		=	'';
+	}
+	if(freqCode==''){
+		freqCode		=	'';
+	}
+	if(typeCode==''){
+		typeCode		=	'';
+	}
+	if(paymentTypeCode==''){
+		paymentTypeCode	=	'';
+	}
+	if(accountTypeCode==''){
+		accountTypeCode	=	'';
+	}
+	var enachProductCode		 =	'';
+	var enachEmailId			 =	'';
+	var enachBankId				 =	'';
+	//Bank name have to display
+	var enachAccountNumber		 = 	'';
+	var enachConfirmAccountNumber= 	'';
+	var enachAcccountType		 = 	'';
+	var enachIfscCode			 =	'';
+	var enachEmiAmount			 =	'';
+	var enachMaximumEmiAmount	 =	'';
+	var enachEmiType			 =	'';
+	var enachEmiFrequency		 =	'';
+	var enachEmiStartDate		 =	'';
+	var enachEmiEndDate			 =	'';
+	var bankFlag 				 = '';
+	var enachPaymentType		 =	'';
+	var enachAccountType		 =	'';
+	console.log("freqName:"+freqName+" enachEmiFrequency:"+enachEmiFrequency+" enachPaymentType"+enachPaymentType);
+	
+	var salt 					=	CryptoJS.lib.WordArray.random(128 / 8);
+	var iv 						=	CryptoJS.lib.WordArray.random(128 / 8); 
+	var encryptionKey 			=	'66466939';
+	var key128Bits 				=	 CryptoJS.PBKDF2(encryptionKey, salt,  {keySize : 128 / 32});
+	var key128Bits100Iterations = CryptoJS.PBKDF2(encryptionKey,salt, {keySize : 128 / 32,iterations : 100 });
+	document.getElementById("vid").value	=	iv;
+	document.getElementById("salt_id").value=	salt;
+	function getEncryptValue( input){
+		var output = CryptoJS.AES.encrypt(input,key128Bits100Iterations,{iv : iv,mode : CryptoJS.mode.CBC,padding : CryptoJS.pad.Pkcs7}); 
+		return output;
+	}
+
+	$(document).on('click','.md-whiteframe-z1 li',function(e){
+		console.log("md-whiteframe-z1");
+		setBankName($(this).text(),$(this).attr("data-value"));
+	});
+
+	$(document).on('click','.md-whiteframe-z9 li',function(e){
+		console.log("md-whiteframe-z9");
+		setPaymentType($(this).text(),$(this).attr("data-value"));
+	});
+	
+	$(document).on('click','.md-whiteframe-z12 li',function(e){
+		console.log("md-whiteframe-z12");
+		setAccountType($(this).text(),$(this).attr("data-value"));
+	});
+
+	$(document).on('click','.md-whiteframe-z2 li',function(e){
+		//alert("cal");
+	    setFreqName($(this).text(),$(this).attr("data-value"));
+	});
+
+	$(document).on('click','.md-whiteframe-z3 li',function(e){
+		//alert("cal");
+	    setTypeName($(this).text(),$(this).attr("data-value"));
+	});
+
+	$('#confirmAccountNumber').on("cut copy paste",function(e) {
+	    e.preventDefault();
+	 });
+	if(bankCode!=''){
+		setBankName(bankName,bankCode);
+	}
+	if(paymentTypeCode!=''){
+		setPaymentType(enachPaymentType,paymentTypeCode);
+	}
+	if(accountTypeCode!=''){
+		setAccountType(enachAccountType,accountTypeCode);
+	}
+	console.log("freqName:"+freqName+" freqCode:"+freqCode);
+	console.log("typeName:"+typeName+" typeCode:"+typeCode);
+	console.log("enachPaymentType:"+enachPaymentType+" paymentTypeCode:"+paymentTypeCode);
+	console.log("enachAccountType:"+enachAccountType+" accountTypeCode:"+accountTypeCode);
+	if(typeCode!=''){
+		setTypeName(typeName,typeCode);
+	}
+	console.log("enachProductCode :"+enachProductCode);
+	if(freqCode!=''){
+		setFreqName(freqName,freqCode);
+	}else if(enachProductCode !="RF"){
+		setFreqName('Monthly','MNTH');
+		$('#ul-id5').hide();
+		setTypeName('Variable Amount','M');
+		$('#ul-id6').hide();
+	}
+
+	if(finoneErr == 'true'){	
+	    var response='';
+		if(response=='001'){
+			$("#errorMessage1").show();
+		}else {
+			$("#errorMessage").show();	
+		}
+	     
+		var year=endDate.split("-")[2];
+		var month=endDate.split("-")[1]-1;
+		var day=endDate.split("-")[0];
+		console.log(year+"::"+month+" :: "+day);
+		
+		var date =new Date(year,month,day);
+		console.log("date = "+date);
+		date.setDate(date.getDate());
+		$('#datepicker_last').datepicker("setStartDate", date);
+	}
+	
+	$(".form-group").removeClass("error_input");
+	var numswithalphabate=/^[0-9a-zA-Z]+$/;
+	var alphabateswithspace=/^[a-zA-Z\s]+$/;
+	var emailValidation = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	var numsonly=/^[0-9-+()]*$/;
+	$(".error_msg").hide();	
+
+	$('#loanAcNo').keyup(function(){
+		validateLoanNo();
+	});
+	$('#name').keyup(function(){
+		validateName();
+	}); 
+	$('#emailId').keyup(function(){
+		validateEmailId();
+	}); 
+	$('#mobileNumber').keyup(function(){
+		validateMobileNumber();
+	}); 
+
+	$("#bankBtn").click(function(){
+		  var me = $(this),
+	      items = [],
+	      myID = me.attr('id'),
+	      arr = dropdownList(myID);
+	      myParent = me.closest('.form-group');
+	      $.each(arr, function(i, item) {
+	          var ddValues=item.split("=");
+	          items.push('<li role="option" class="ng-binding ng-scope" tabindex="-1" aria-selected="false" data-value="'+ddValues[0]+'">' + ddValues[1] + '</li>');
+	      }); 
+	      myParent.find('#ul-id4').empty().html(items.join(''));
+	      //$("#ul-id4").removeAttr("style");
+	});
+	 $("#paymentBtn").click(function(){
+		 //alert(bankFlag);
+		 if(!bankFlag){
+			 $("#bankBtn").text("Select Bank");//here we are refreshing the bank name dropdowns every time
+			  var me = $(this),
+		      items = [],
+		      myID = me.attr('id'),
+		      arr = dropdownPaymentList(myID);
+		      myParent = me.closest('.form-group'); 
+		       $.each(arr, function(i, item) {
+		       var ddValues=item.split("=");
+		        items.push('<li role="payment" class="ng-binding ng-scope" tabindex="-1" aria-selected="false" data-value="'+ddValues[0]+'">' + ddValues[1] + '</li>');
+		      });   
+		      myParent.find('#ul-id41').empty().html(items.join(''));    
+		 }
+	});  
+	 $("#accountTypeBtn").click(function(){
+		  var me = $(this),
+	     items = [],
+	     myID = me.attr('id'),
+	     arr = dropdownAccountList(myID);
+	     myParent = me.closest('.form-group'); 
+	      $.each(arr, function(i, item) {
+	      var ddValues=item.split("=");
+	       items.push('<li role="option" class="ng-binding ng-scope" tabindex="-1" aria-selected="false" data-value="'+ddValues[0]+'">' + ddValues[1] + '</li>');
+	     });   
+	     myParent.find('#ul-id3').empty().html(items.join(''));    
+	});
+	$("#freqBtn").click(function(){
+		//validateBankName();
+		  var me = $(this),
+	      items = [],
+	      myID = me.attr('id'),
+	      arr = dropdownListForFreq(myID);
+	      myParent = me.closest('.form-group');
+	      $.each(arr, function(i, item) {
+	          var ddValues=item.split("=");
+	          items.push('<li role="option" class="ng-binding ng-scope" tabindex="-1" aria-selected="false" data-value="'+ddValues[0]+'">' + ddValues[1] + '</li>');
+	      });
+	      myParent.find('#ul-id5').empty().html(items.join(''));
+	});
+
+	$("#typeBtn").click(function(){
+		//validateBankName();
+		  var me = $(this),
+	      items = [],
+	      myID = me.attr('id'),
+	      arr = dropdownListForType(myID);
+	      myParent = me.closest('.form-group');
+	      $.each(arr, function(i, item) {
+	          var ddValues=item.split("=");
+	          items.push('<li role="option" class="ng-binding ng-scope" tabindex="-1" aria-selected="false" data-value="'+ddValues[0]+'">' + ddValues[1] + '</li>');
+	      });
+	      myParent.find('#ul-id6').empty().html(items.join(''));
+	});
+	$('#loanAmount').keyup(function(){
+		validateLoanAmount();
+	});
+
+
+	$('#accountNumber').keyup(function(){	
+		validateAccountNO();
+	});
+	$('#ifscCode').keyup(function(){
+		validateIfscCode();
+	});
+	$('#emiAmount').keyup(function(){
+		validateEmiAmount();
+	});
+	$("#submitMandate").click(function(){
+		document.getElementById("productCode").value='HL';
+		var productCode 			=	'HL';
+		var loanNumber 				=	$('#loanAcNo').val();
+		var name 					=	$('#name').val();
+		var emailId 				=	$('#emailId').val();
+		var mobileNumber 			=	$('#mobileNumber').val();
+		var loanAmount 				=	$('#loanAmount').val();
+		var accountNumber 			=	$('#accountNumber').val();
+		var confirmAccountNumber 	=	$("#confirmAccountNumber").val();
+		var ifscCode 				=	$('#ifscCode').val();
+		var emiAmount 				=	$('#emiAmount').val();
+		var maxEmiAmount 			=	$('#maximumEmiAmount').val();
+		var emiStartDate 			=	$("#datepicker_first").val();
+		var emiEndDate 				= 	$("#datepicker_last").val();
+		var paymentType 			= 	$("#paymentType").val();
+		var bankName 				= 	$("#bankName").val();
+		var emiFrequency			=	$("#freqName").val();
+		var emiType					=	$("#typeName").val();
+		var acType					=	$("#acccountType").val();
+		
+		$("#emiFrequency").val(emiFrequency);
+		$("#emiType").val(emiType);
+		//var emiType=$('input[name=emiType]:checked').val();
+		//var emiFrequency=$('input[name=emiFrequency]:checked').val();
+		var bankFlag = '';
+		if(bankFlag){
+			if(enachEmiEndDate != ""){
+				 emiEndDate = $("#emiEndDate").val();
+				 $("#emiEndDate").attr("id","datepicker_last");
+			}
+			if(enachEmiStartDate != ""){
+				emiStartDate=$("#emiStartDate").val();
+				$("#emiStartDate").attr("id","datepicker_first");
+			}
+		}
+		if(productCode=='RF'){
+			loanAmount=' ';
+		}	
+		
+		var qs=loanNumber+"&"+name+"&"+emailId+"&"+mobileNumber+"&"+loanAmount+"&"+accountNumber+"&"+confirmAccountNumber+"&"+
+			   ifscCode+"&"+emiAmount+"&"+maxEmiAmount+"&"+emiStartDate+"&"+emiEndDate+"&"+bankName+"&"+acType+"&"+emiType+"&"+emiFrequency+"&"+paymentType;
+		console.log("Data before encryption :: "+qs);
+		var encqs=CryptoJS.AES.encrypt(qs,key128Bits100Iterations,{iv : iv,mode : CryptoJS.mode.CBC,padding : CryptoJS.pad.Pkcs7});
+		document.getElementById("qs").value=encqs;
+		 console.log("loanNumber = "+loanNumber+", name = "+name+", emailId = "+emailId+", mobileNumber = "+mobileNumber
+				+", accountNumber = "+accountNumber+", confirmAccountNumber = "+confirmAccountNumber+", ifscCode = "+ifscCode
+				+", emiAmount = "+emiAmount+", maxEmiAmount = "+maxEmiAmount+", emiStartDate =  "+emiStartDate+", emiEndDate, "+emiEndDate+"bank Name ="+bankname); 
+		
+		var loanAcFlag		=	validateLoanNo();
+		var nameFlag		=	validateName();
+		var emailIdFlag		=	validateEmailId();
+		var mobileFlag		=	validateMobileNumber();
+		var acFlag			=	validateAccountNO();
+		var cacFlag			=	validateConfirmACNO();
+		var ifscFlag		=	validateIfscCode();
+		var emiAmtFlag		=	validateEmiAmount();
+		var maxEmiAmtFlag	=	validateMaxEmiAmount();
+		var bankNameFlag	=	validateBankName();
+		var emiStartFlag	=	validateEmiStartDate();
+		var emiEndFlag		=	false;
+		if(emiStartFlag){
+			emiEndFlag	=	validateEmiEndDate();
+		}
+		var termsFlag		=	validateTerms();
+		var freqNameFlag	=	validateFreqName();
+		var typeNameFlag	=	validateTypeName();
+		var payTypeFlag 	= 	validatePayType();
+		var accTypeFlag 	=	validateAccType();
+		var amtFlag;
+		if(productCode=='RF'){
+			amtFlag	=	true;
+		}else{
+			amtFlag=validateLoanAmount();
+		}
+		
+		if(loanAcFlag && nameFlag && emailIdFlag && mobileFlag && amtFlag && acFlag && cacFlag && ifscFlag && emiAmtFlag && maxEmiAmtFlag 
+				&& bankNameFlag && emiStartFlag && emiEndFlag && termsFlag && freqNameFlag && typeNameFlag && payTypeFlag && accTypeFlag){
+			$("#lano_errormsg").hide();
+	    	$(".loanno").removeClass("error_input");
+	    	$("#name_errMsg").hide();
+	    	$(".name").removeClass("error_input");
+	    	$("#email_errMsg").hide();
+	    	$(".email").removeClass("error_input");
+	    	$("#mobile_errMsg").hide();
+			$(".mobile").removeClass("error_input");
+			$("#ac_errMsg").hide();
+			$(".debitAc").removeClass("error_input");
+			$("#cac_errMsg").hide();
+			$(".confirmAc").removeClass("error_input");
+			$("#ifsc_errMsg").hide();
+	    	$(".ifsc").removeClass("error_input");
+	    	$("#eamt_errMsg").hide();
+	    	$(".emiAmt").removeClass("error_input");
+	    	$("#mamt_errMsg").hide();
+	    	$(".maxEmiAmt").removeClass("error_input");
+	    	$("#emiStart_errMsg").hide();
+	    	$("#emiend_errMsg").hide();
+	    	$("#bn_errMsg").hide();
+	    	$("#terms_errMsg").hide();
+	    	$("#emiStart_errMsg").hide();
+	    	$("#emiend_errMsg").hide();
+	    	$("#accType_errMsg").hide();
+	    	
+	    	var isSubmit=confirm("Do you want Authorize Mandate?");
+	    	if(isSubmit){
+		    	document.enachForm.action="submitNpciEnachForm.htm";
+		    	document.enachForm.submit();
+	    	}
+		}else{
+	    	return false;
+	    }
+	});
+});
+</script>
+</head>
+
+<body class="mandate_page">
+
+  <!-- nav for desktop -->
+  <div class="container1 statementWrapper">
+    <div class="top-bar">
+      <!-- <div class="middleContainer clearfix"> -->
+        <!-- <ul class="menu">
+          <li class="selected"><a href="http://icicibank.com/" target="_blank">Personal</a></li>
+          <li><a href="http://icicibank.com/privilege-banking/index.page" target="_blank">Privilege</a></li>
+          <li><a href="http://www.icicibank.com/wealth-management/index.page" target="_blank">Wealth</a></li>
+          <li><a href="http://www.icicibankprivatebanking.com/" target="_blank">Private</a></li>
+          <li><a href="http://www.icicibank.com/nri-banking/nri_banking.page" target="_blank">NRI</a></li>
+          <li><a href="http://www.icicibank.com/corporate/corp-index.page" target="_blank">Corporate</a></li>
+          <li><a href="http://www.icicibank.com/business-banking/index.page" target="_blank">Business</a></li>
+        </ul> -->
+
+      <!-- </div> -->
+    </div>
+    <div class="logo-top">
+      <div class="Logo"></div>
+    </div>
+  </div>
+  <!--- Navbar Code End -->
+
+  <section class="main-section">
+    <form id="enachForm" name="enachForm" th:action="@{/SaveCustData}" th:object="${CustDetails}" method="post">
+		<div class="container">
+      <div class="row">
+
+        <div class="col-lg-12 col-md-12 detail-col">
+          <h3>Customer Information</h3>
+
+          <div class="form_div row">
+          	<!-- <p id="errorMessage" style="display:none" class="error">Loan Account Number does not match with our records.</p> -->
+          	<p id="errorMessage" style="display:none" class="error">Loan Number / Loan Amount / Collection Amount does not match with our records.</p>
+			<p id="errorMessage1" style="display:none" class="error">Currently we are unable to process your request.</p>
+			
+            <div class="form-group col-lg-6 col-md-12 error_input loanno">
+              <label for="account_no" class="label-text error_input">Loan Number*</label>
+              <div class="input-div">
+				<input id="loanAcNo" name="loanAcNo" th:field="*{loan_Number}" class="acc" data-validation="required custom" data-validation-error-msg="Enter Valid Account number" type="text" value=""/>
+                <p class="error_msg"  id="lano_errormsg" style="display:none">Please enter your Loan Account Number.</p>
+              </div>
+            </div>
+            <div class="form-group col-lg-6 col-md-12 error_input name">
+              <label for="full_n" class="label-text">Full Name*</label>
+              <div class="input-div">
+				<input id="name" name="name" th:field="*{name}" class="name" type="text" value="" maxlength="50"/>
+				<p class="error_msg" id="name_errMsg" style="display:none">Please enter your Name.</p>
+              </div>
+            </div>
+            <div class="form-group col-lg-6 col-md-12 error_input mobile">
+              <label for="mobile" class="label-text">Mobile Number*</label>
+              <div class="input-div">
+				<input id="mobileNumber" name="mobileNumber" th:field="*{mobile}" class="mobile" type="text" value="" maxlength="10"/>
+				<p class="error_msg" id="mobile_errMsg">Please enter your mobile number.</p>
+              </div>
+            </div>
+            <div class="form-group col-lg-6 col-md-12 error_input email">
+              <label for="email" class="label-text">E-mail ID*</label>
+              <div class="input-div">
+				<input id="emailId" name="emailId" th:field="*{email}" class="email" type="text" value="" maxlength="50"/>
+				<p class="error_msg" id="email_errMsg">Please enter your E-mail ID.</p>
+              </div>
+            </div>
+								
+            <div class="form-group col-lg-6 col-md-12 error_input loanAmount">
+              <label for="relation" class="label-text">Loan Amount</label>
+              <div class="input-div">
+                <input id="loanAmount" name="loanAmount" th:field="*{loan_amt}" type="number" class="rupee" value=""/>
+			  <p class="error_msg" id="la_errMsg">Please enter loan amount.</p>
+			  </div>
+            </div>
+            
+          </div>
+
+          <h3 class="margin-top-label">Debit Account Details</h3>
+
+          <div class="form_div row">
+          <div class="form-group dropdown-form col-lg-6" >
+									<label for="select_bank" class="label-text">Create mandate with*</label> 
+									<input type="hidden" name ="hidePaymentType" id="hidePaymentType" value="{Aadhaar number=Aadhaar number, Net Banking=Net Banking, Debit Card=Debit Card}">
+									<div class="md-select payment-select" style="z-index:190">
+										<label for="ul-id41">
+											<button type="button" id="paymentBtn" class="ng-binding paymentType">Select Payment Type</button>
+										</label>
+										<ul role="listbox" id="ul-id41" class="md-whiteframe-z9" aria-activedescendant="back" name="ul-id41"></ul> 
+										<p class="error_msg" id="payType_errMsg">Please select Payment Type</p>
+									</div>  
+								</div>
+								
+          
+            <!-- <div class="form-group dropdown-form col-lg-6">
+                <label for="select_bank" class="label-text">Select Bank*</label>
+                <input type="hidden" name ="hidBname" id="hidBname" value="{9620=IDBI BANK, 9500=Punjab National Bank, 9820=Bank Of Maharashtra, 11020=Standard Chartered Bank, 14330=UCO Bank, 9780=RBL BANK, 9660=HDFC BANK LTD, 13640=JANA SMALL FINANCE BANK LTD, 10970=KARNATAKA BANK LTD, 11940=South Indian Bank, 9510=Central Bank of India, 15470=SURYODAY SMALL FINANCE BANK LTD, 11390=Union Bank of India, 14860=AIRTEL PAYMENTS BANK LTD, 9830=Deutsche Bank, 10020=Equitas Small Finance Bank, 11230=Dhanalaxmi Bank, 9670=Indian Overseas Bank, 9470=INDUS IND Bank, 34610=NSDL PAYMENTS BANKS LTD, 12840=PUNJAB AND SIND BANK, 14820=JIO PAYMENTS BANK LTD, 13970=CITI BANK, 11950=HSBC, 9520=IDFC Bank, 9640=Tamilnad Mercantile Bank, 14870=THE CATHOLIC SYRIAN BANK, 13980=BANDHAN BANK LTD, 9600=Ujjivan Small Finance Bank, 11240=The Cosmos Co-Operative Bank, 9480=Axis Bank, 9560=Yes Bank, 9880=Paytm Payments Bank, 22490=THE JAMMU AND KASHMIR BANK LTD, 14830=THE VARACHHA CO OP BANK LTD, 11960=DBS Bank India Ltd, 13900=INDIAN BANK, 15450=KARNATAKA VIKAS GRAMEENA BANK, 11050=State Bank of India, 9530=Kotak Mahindra Bank, 14760=DCB BANK LTD, 11130=Canara Bank, 14880=ANDHRA PRAGATHI GRAMEENA BANK, 9490=Bank of Baroda, 9890=City Union Bank, 15490=ESAF SMALL FINANCE BANK LTD, 22780=SBM BANK INDIA LTD, 10000=Federal Bank, 12860=KARUR VYSA BANK, 14800=AU SMALL FINANCE BANK}">
+				<input type="hidden" name ="hideDebitBankName" id="hideDebitBankName" value="{15020=IDBI BANK, 9540=Kotak Mahindra Bank, 11060=State Bank Of India, 36680=Saraswat Co operative Bank, 11140=Punjab National Bank, 21420=THE ZOROASTRIAN CO OP BANK LTD, 36560=ELLAQUAI DEHATI BANK, 12030=Tamilnad Mercantile Bank Ltd, 15540=SHIVALIK SMALL FINANCE BANK LTD, 15220=THE CHEMBUR NAGARIK SAHAKARI BANK, 14770=UNION BANK OF INDIA, 19180=THE SURAT PEOPLES CO OP BANK LTD, 15180=AIRTEL PAYMENTS BANK LTD, 11220=Citi Bank, 12870=Bank of Baroda, 10850=HDFC BANK, 10930=DEUTSCHE BANK, 9630=INDUSIND Bank, 15230=UTKARSH SMALL FINANCE BANK LTD, 11030=FEDERAL Bank, 21750=THE JUNAGADH COMMERCIAL CO OP BANK LTD, 11150=KARNATAKA BANK LTD, 21430=MAHESH SAHAKARI BANK LTD PUNE, 19150=THE NATIONAL CO OP BANK LTD, 19190=CAPITAL SMALL FINANCE BANK LTD, 15070=PUNJAB AND SIND BANK, 15190=THE CATHOLIC SYRIAN BANK, 23170=RAJARSHI SHAHU SAHAKARI BANK LTD, 22480=THE JAMMU AND KASHMIR BANK LTD, 10860=Bank of Maharashtra, 12800=Axis Bank, 15120=INDIAN BANK, 36580=CHHATTISGARH GRAMIN BANK, 15480=SURYODAY SMALL FINANCE BANK LTD, 15200=ANDHRA PRAGATHI GRAMEENA BANK, 22770=SBM BANK INDIA LTD, 15160=THE ADARSH CO OP URBAN BANK LTD, 19160=KURLA NAGARIK SAHAKARI BANK LTD, 9680=SOUTH INDIAN Bank, 23180=FINCARE SMALL FINANCE BANK LTD, 34600=NSDL PAYMENTS BANKS LTD, 10870=AU Small Finance Bank, 11920=Dhanalaxmi Bank, 15010=CENTRAL BANK OF INDIA, 15130=BANK OF INDIA, 9650=EQUITAS SMALL FINANCE BANK, 11250=RBL BANK LTD, 11690=Paytm Payments Bank Ltd, 14320=STANDARD CHARTERED BANK, 9610=UJJIVAN SMALL FINANCE BANK, 15050=CANARA BANK, 15170=THE KALUPUR COMMERCIAL CO OP BANK, 9570=YES Bank, 11410=DCB Bank Ltd, 11970=DBS Bank India Ltd, 13630=JANA SMALL FINANCE BANK LTD, 10840=IDFC FIRST BANK, 14800=AU SMALL FINANCE BANK}">
+                <input type="hidden" name ="hideAadharBankName" id="hideAadharBankName" value="{20330=SRI BANASHANKARI MAHILA COOPERATIVE BANK LTD, 20450=THE ALAPPUZHA DISTRICT CO OPERATIVE BANK LTD, 20570=APNA SAHAKARI BANK LTD, 17280=THE SAHYADRI SAHAKARI BANK LTD, 19580=KASHIPUR URBAN CO OPERATIVE BANK LTD, 18370=PUNE CANTONMENT SAHAKARI BANK LTD, 18250=THE KALNA TOWN CREDIT CO OP BANK LTD, 17040=AHILYADEVI URBAN CO OP BANK LTD SOLAPUR, 18130=INDORE CLOTH MARKET CO OP BANK LTD, 34740=THE LUNAWADA PEOPLES CO OP BANK LTD, 3510=Bank Of India, 34860=PRIYADARSHANI NAGARI SAHAKARI BANK LTD JALNA, 34980=FINO PAYMENTS BANK LTD, 20100=THE KOYLANCHAL URBAN CO OPERATIVE BANK LTD, 20220=THE THANE DIST CENTRAL CO OP BANK LTD, 20340=LOKNETE DATTAJI PATIL SAHAKARI BANK LTD, 21550=THE ROPAR CENTRAL COOPERATIVE BANK, 3530=Central Bank of India, 16080=SINDHUDURG  DISTRICT CENTRAL CO OP BANK LTD, 17170=VIKAS SOUHARDA CO OP BANK LTD, 19230=HANAMASAGAR URBAN CO OPERATIVE BANK LTD, 18020=SHREE MAHUVA NAGRIK SAHAKARI BANK LTD, 19350=QUILON CO OP URBAN BANK LTD, 34730=UDYAM VIKAS SAHAKARI BANK LTD PUNE, 34850=THE PATAN URBAN CO OP BANK LTD PATAN, 34970=THE GUNTUR CO OP URBAN BANK LTD, 3520=Indusind Bank, 5820=The Shillong Co Op Urban Bank Ltd, 18230=KRISHNA MERCANTILE CO OP BANK LTD, 17020=THE SONEPAT URBAN CO OP BANK LTD, 18110=THE IMPHAL URBAN CO OP BANK, 19440=THE ANNASAHEB SAVANT CO OP URBAN BANK MAHAD, 20550=GRAMIN BANK OF ARYAVART, 5840=DHARMAPURI DISTRICT CENTRAL CO OP BANK LTD, 17380=THE GRAIN MERCHANTS CO-OPERATIVE BANK, 3540=Citibank N A, 18470=THE CITIZENS CO OP BANK LTD JAMMU, 17260=THE NASIK MERCHANTS CO OP BANK LTD, 19560=KOLHAPUR MAHILA SAHAKARI BANK LTD, 18350=THE GANDHI CO OP URBAN BANK LTD, 19680=PRAGATHI KRISHNA GRAMIN BANK, 34720=UTTAR PRADESH CO OP BANK LTD, 34840=SADHANA SAHAKARI BANK LTD PUNE, 34960=SARVA HARYANA GRAMIN BANK, 5830=AMRELI JILLA MADHYASTHA SAHAKARI BANK LTD, 5710=RENDAL SAHAKARI BANK LTD RENDAL, 20200=SHRI VINAYAK SAHAKARI BANK LTD, 19210=ADARSH CO OPERATIVE BANK LTD, 21530=PURVANCHAL COOP BANK LTD GAZIPUR, 19330=THE PATIALA CENTRAL COOPERATIVE BANK LTD, 4520=Varachha Cooperative Bank, 5730=THE AGRASEN CO OP URBAN BANK LTD, 3430=KOTAK MAHINDRA BANK LTD, 17150=THE JAMNAGAR MAHILA SAHAKARI BANK LTD, 16060=SHRI MAHILA SEWA SAHAKARI BANK LTD, 16180=THE CALICUT CO OP URBAN BANK LTD, 34710=VAISHYA SAHAKARI BANK LTD MUMBAI, 34830=SBPP CO OP BANK LTD, 34950=THE J AND K STATE CO OP BANK LTD, 5720=LOKMANGAL CO OP  BANK LTD  SOLAPUR, 7900=THE BIHAR AWAMI CO OPERATIVE BANK LTD, 20530=ARUNACHAL PRADESH RURAL BANK, 18450=DOMBIVILI NAGARI SAHAKARI BANK LTD, 17240=DELHI NAGRIK SEHKARI BANK LTD, 21860=Textile Co-op Bank, 5860=THE POCHAMPALLY CO OP URBAN BANK LTD, 18330=VIDHARBHA KONKAN GRAMIN BANK, 19660=PUDUVAI BHARATHIAR GRAMA BANK, 18210=THE JODHPUR CENTRAL CO OP BANK LTD, 17000=THE BIHAR STATE CO OP BANK LTD, 4530=BANK OF BARODA, 4410=THE AKOLA DISTRICT CENTRAL COOPERATIVE BANK LTD, 3200=AXIS BANK, 3440=IDBI BANK, 19780=AU Small Finance Bank Ltd, 3560=FEDERAL BANK, 17360=Dharamvir Sambhaji Urban Co-Operative Bank Ltd, 18570=BHINGAR URBAN CO OP BANK LTD, 34700=THE VAISH CO OP NEW BANK LTD, 34820=SHRI BHARAT URBAN CO OP BANK LTD JAYSINGPUR, 34940=JABALPUR MAHILA NAGRIK SAHKARI BANK MARYADIT, 4400=SOUTH INDIAN BANK, 20300=ZILA SAHAKARI BANK LTD MEERUT, 21510=PRAGATI SAHAKARI BANK LTD, 21630=INDIAN OVERSEAS BANK, 17130=SHRI MAHAVIR URBAN CO OP BANK LTD, 19550=YAVATMAL DISTRICT CENTRAL CO OPERATIVE BANK LTD, 20660=THE DELHI STATE COOPERATIVE BANK LIMITED, 21870=SHRI GAJANAN MAHARAJ URBAN CO OP BANK LTD, 20780=THE KANNUR CO OP URBAN BANK LTD, 19310=THE PUNJAB STATE COOPERATIVE BANK LTD, 17490=The Merchant's liberal coop bank, GADAG, 18580=THE CENTRAL CO OP BANK LTD BHILWARA, 16040=THE SARVODAYA NAGRIK SAHKARI BANK LTD, 16160=THE MAKARPURA INDUSTRIAL ESTATE CO OP BANK LTD, 16280=URBAN CO OP BANK LTD DEHRADUN, 34810=SHREE MAHESH CO OP BANK LTD NASHIK, 34930=THE KALUPUR COMMERCIAL CO OP BANK, 20510=APANI SAHAKARI BANK LTD, 5880=Karnataka Bank Ltd, 17460=THE NAVNIRMAN CO-OPERATIVE BANK LTD, 18670=THE GHATAL PEOPLES CO OP BANK LTD, 19760=VIDYANAND CO OP BANK LTD, 17340=THE ASHTA PEOPLE'S CO-OP BANK LTD., ASHTA, 5640=KOZHIKODE DISTRICT CO OP BANK, 18550=BHADOHI URBAN CO OP BANK LTD GYANPUR, 18430=SANMATI SAHAKARI BANK LTD, 17220=THE BHAGYODAYA CO OP BANK LTD, 18310=THE VERAVAL MERCANTILE CO OP BANK LTD, 17100=THE SAURASHTRA CO OP BANK LTD, 19640=DOHA BANK QSC, 3220=Standard Chartered Bank, 18790=Nagar Sahkari Bank Ltd, 3460=THE SUTEX CO OP BANK LTD, 34800=SHARAD SAHAKARI BANK LTD, 34920=THE KHEDA PEOPLES CO OP BANK LTD, 7810=Palus Sahakari Bank Ltd, 6600=LAXMIBAI MAHILA NAGRIK SAHAKARI BANK MARADIT, 8900=The Khattri Co-operative (U) Bank Ltd., 21610=PAYTM PAYMENTS BANK LTD, 16020=THE DAHOD URBAN CO OP BANK LTD, 16140=HIMATNAGAR NAGARIK SAHAKARI BANK LTD, 20640=CITIZENS CO  OPERATIVE BANK LTD, 5650=JANASEVA SAHAKARI BANK BORIVLI LTD, 7950=The Urban Cooperative Bank Ltd Saharanpur, 20760=JAMSHEDPUR URBAN CO  OPERATIVE BANK LTD, 20880=SIR M VISVESVARAYA CO  OPERATIVE BANK LTD, 6500=RAJADHANI CO OP URBAN BANK LTD, 17110=SARDAR VALLABHBHAI SAHAKARI BANK LTD, 19410=SULAIMANI COOP BANK LTD, 19530=THE CO OPERATIVE CITY BANK LTD, 3110=SVC Cooperative Bank Ltd, 3230=The Cosmos Co-Operative Bank Ltd, 18680=ALLAHABAD DISTRICT CENTRAL CO-OPERATIVE BANK LTD, 16260=UMA CO OP BANK LTD, 16380=SHIVDAULAT SAHAKARI BANK LTD, 3470=Union Bank Of India, 15290=THE UNION CO OP BANK LTD, 34910=THE KRANTHI CO OP URBAN BANK LTD, 5780=Universal Co Op Urban Bank Ltd, 13880=Alavi Co op Bank Ltd, 6630=Ramgarhia Co  operative Bank Ltd, 3120=HDFC Bank Ltd, 3240=The Hongkong and Shanghai Banking Corporation Ltd, 18090=HAMIRPUR DISTRICT CO OP BANK LTD, 3480=IDFC Bank, 15700=THE AHMEDABAD DISTRICT CO OP BANK LTD, 16910=SONBHADRA NAGAR SAHKARI BANK LTD, 15820=THE SURAT PEOPLES CO OP BANK LTD, 15940=UTTAR BIHAR GRAMIN BANK, 8800=Jodhpur Nagrik Sahakari Bank Ltd, 20050=BHOPAL CO OPERATIVE CENTRAL BANK LTD, 20170=SADGURU NAGRIK SAHAKARI BANK MARYADIT, 20290=ZILA SAHKARI BANK LTD GHAZIABAD, 5790=ANDHRA PRAGATHI GRAMEENA BANK, 6520=ZILA SAHKARI BANK LTD GARHWAL KOTDWAR, 6640=Durgapur Steel Peoples Co op Bank Ltd, 34690=VIJAY COMMERCIAL CO OP BANK LTD, 3130=Bharat Cooperative bank, 3250=Canara Bank, 3490=Abhyudaya Co Op Bank, 16800=ADARNIYA P D PATILSAHEB SAHAKARI BANK LTD, 5560=SHRI VEERSHAIV CO OP BANK LTD, 7860=THE SOLAPUR SOCIAL URBAN CO OP BANK LTD, 6650=NAGRIK SAHAKARI BANK LTD LUCKNOW, 5320=THE ADINATH CO OP BANK LTD, 6410=TEHRI GARHWAL ZILA SAHKARI BANK LTD, 6530=THE SURAT DISTRICT CO OP BANK, 8830=Osmanabad Janata Sahakari Bank Ltd, 19040=THE SHIMLA URBAN COOP BANK LTD, 34680=WARANGAL URBAN CO OP BANK LTD, 18190=IRINJALAKUDA TOWN CO OP BANK LTD, 3260=RBL Bank, 18070=THE HASSAN DISTRICT CO OP CENTRAL BANK LTD, 15920=THE MALAPPURAM DISTRICT CO OP BANK LTD, 20030=BRAHMADEODADA MANE SAHAKARI BANK LTD SOLAPUR, 20270=THE UMRETH URBAN CO OPERATIVE BANK LTD, 20390=RAMPUR ZILA SAHKARI BANK LTD, 15800=MARATHA CO OP BANK LTD, 5570=THE ANDHRA PRADESH STATE CO OP BANK LTD, 6660=PALI URBAN CO OP BANK LTD, 6420=TUMKUR GRAIN MERCHANTS CO OP BANK LTD, 21010=DISTRICT CO  OPERATIVE BANK LTD RAEBARELI, 34670=THE YAVATMAL URBAN CO OP BANK LTD YAVATMAL, 34790=SHREE BHARAT CO OP BANK LTD, 19290=ODISHA GRAMYA BANK, 3150=Yes Bank Ltd, 19050=Kamala Co Op Bank Ltd Solapur, 21490=DEVELOPMENT CO OPERATIVE BANK LTD KANPUR, 4370=DCB BANK LTD, 6670=JHARNESHWAR NAGRIK SAHAKARI BANK MARYADIT, 5580=The Trivandrum Co-Operative Urban Bank Ltd, 8850=CITIZEN CO OPERATIVE BANK LTD, 5340=THE ADARSH CO OP URBAN BANK LTD, 6430=JANATA SAHAKARI BANK LTD, 6550=VASAI JANATA SAHAKARI BANK LTD, 20010=THE ASSOCIATE CO OPERATIVE BANK LTD, 18050=THE TIRUR URBAN CO OP BANK LTD, 34660=PANVEL CO OPERATIVE URBAN BANK LTD, 34780=SURAT NATIONAL CO OP BANK LTD, 18290=VIKRAMADITYA NAGRIK SAHAKARI BANK, 17080=THE ANAND MERCANTILE CO OP BANK LTD, 3160=UCO Bank, 18170=INDORE PREMIER CO OP BANK LTD INDORE, 20490=AP MAHESH COOPERATIVE BANK, 15900=THE AKOLA JANATA COMMERCIAL CO OP BANK LTD, 3170=Punjab National Bank, 8860=MANSAROVAR URBAN CO-OPERATIVE BANK LTD, 6560=NAINITAL DISTRICT CO OPERATIVE BANK LTD, 6680=AMBARNATH JAI HIND CO OP BANK LTD, 6440=Bharati Sahakari Bank Ltd Pune, 8500=Shree Kadi Nagarik Sahakari Bank Ltd, 19030=THE KOLHAPUR URBAN CO OP BANK LTD, 34770=SUVARNAYUG SAHAKARI BANK LTD, 34890=THE MEHMADABAD URBAN PEOPLES CO OP BANK LTD, 19270=NASIK DISTRICT CENTRAL CO OPERATIVE BANK LTD, 5590=THE KARNATAKA STATE CO OP APEX BANK LTD, 19390=SHREE BHAVNAGAR NAGRIK SAHAKARI BANK LTD, 20140=PARASPAR SAHAYAK CO OP BANK, 21470=THE ALWAYE URBAN COOPERATIVE BANK LTD, 20380=PRAGATI MAHILA NAGRIK SAHAKARI BANK LTD BHILAI, 21590=Progressive Co-operative Bank Limited, 3180=Saraswat Cooperative Bank Ltd, 7540=New India Co-op Bank Ltd, 19000=Malviya Urban Co Operative Bank Ltd, 18270=THE URBAN CO OP BANK LTD ROURKELA, 17060=THE AMRAVATI DISTRICT CENTRAL CO OP BANK LTD, 34880=NAVSARJAN INDUSTRIAL CO OPERATIVE BANK LTD, 18150=INDORE PARASPAR SAHAKARI BANK LTD, 18030=THE UDAIPUR CENTRAL CO OP BANK LTD, 4390=Karur Vyas Bank, 6690=THE GUJARAT STATE CO OP BANK LTD, 18390=RAILWAY EMPLOYEES CO OP BANKING SOCIETY LTD, 34760=SARVODAYA COMMERICAL CO OP BANK LTD, 20470=AP JANATA COOPERATIVE URBAN BANK LTD, 20590=AHMEDNAGAR SHAHAR SAHAKARI BANK MARYADIT, 6340=Zila Sahakari Bank Ltd Haridwar, 8520=Tjsb Sahakari Bank Ltd, 3190=Bank of Maharashtra, 7430=THE KOTTAYAM DISTRICT CO OP BANK LTD, 8400=The Satara District Central Co-Operative Bank Ltd., 20120=MAHANAGAR NAGRIK SAHAKARI BANK MARYADIT, 20240=THE THOOTHUKUDI DISTRICT CENTRAL COOP BANK LTD, 19250=IDUKKI DISTRICT CO OPERATIVE BANK LTD, 34990=DINDIGUL CENTRAL CO OP BANK LTD, 19370=COL RD NIKAM SAINIK SAHAKARI BANK LTD, 7790=PATHANMTHITTA DISTRICT CO OP BANK LTD, 34750=THE GANDHINAGAR URBAN CO OP BANK LTD, 34870=THE PUDUCHERRY STATE CO OP BANK LTD, 20360=INDORE SWAYAM MAHILA CO OP BANK LTD, 21570=RAJGURUNAGAR SAHAKARI BANK LTD, 15780=THE NAINITAL BANK LIMITED, 8530=Bhilwara Urban Co Op Bank Ltd, 6350=Manorama Co Op Bank Ltd Solapur, 17960=S S L S A KURUNDWAD URBAN BANK LTD, 17840=THE LATUR URBAN CO OP BANK LTD LATUR, 17720=BHAGINI NIVEDITA SAHAKARI BANK LTD, 18930=The Industrial Co Op Bank Ltd, 16750=THE KUKARWADA NAGARIK SAHAKARI BANK LTD, 15660=THE WAI URBAN CO OP BANK LTD, 35030=THE COIMBATORE DISTRICT CENTRAL CO OP BANK LTD, 8890=JANAKALYAN SAHAKARI BANK, 7680=CHARTERED SAHAKARI BANK NIYAMITHA, 6590=THE GURUVAYUR CO OP URBAN BANK LTD, 17600=AMBAJOGAI PEOPLES CO OP BANK LTD, 18810=The Neela Krishna Co Op Urban Bank Ltd, 19900=Jamnagar District Coop Bank Ltd, 8420=City Union Bank Ltd, 16880=THE BARAMATI SAHAKARI BANK LTD, 14460=MODEL CO OP BANK LTD, 7450=The Kanakamahalakshmi Co-operative Bank Ltd, 18820=Yadagiri Lakshmi Narsimha Swamy Co Op Urban Bank, 16400=SANDUR PATTANA SOUHARDA SAHAKARI BANK NIYAMITHA, 15310=THE BARODA CITY CO OP BANK LTD, 16520=THE MEGHALAYA CO OP APEX BANK LTD, 16640=JIVAN COMMERCIAL CO OP BANK LTD, 16760=THE KALOL NAGARIK SAHAKARI BANK LTD, 350980=BHATPARA NAIHATI CO OP BANK LTD, 35020=THE COOP BANK OF MEHSANA LTD, 20900=THE UNITED CO OPERATIVE BANK LTD, 6360=BASSEIN CATHOLIC CO-OP BANK LTD, 18700=THE SARVODAYA CO OP BANK LTD MUMBAI, 19910=KERALA GRAMIN BANK, 8550=ETAH URBAN CO OP BANK LTD, 8430=NAGAR VIKAS SAHKARI BANK LTD, 17940=RAJARAMBAPU SAHAKARI BANK LTD PETH, 15760=SOLAPUR SIDDHESHWAR SAHAKARI BANK LTD, 16970=THE MANIPUR STATE CO OP BANK LTD, 15880=ANDHRA PRADESH GRAMEENA VIKAS BANK, 35010=CHURU ZILA URBAN CO OP BANK LTD, 35130=ABHINANDAN URBAN CO OP BANK AMRAVATI, 6370=AMAN SAHAKARI BANK LTD, 17700=DR AMBEDKAR NAGRIK SAHAKARI BANK MYDT GWALIOR, 18910=Shri Adinath Co Op Bank Ltd, 8440=The Ajara Urban Co op Bank Ltd, 15410=THE AHMEDNAGAR DISTRICT CENTRAL CO OP BANK LTD, 16620=PEOPLES URBAN CO OP BANK LTD, 16860=BADAUN ZILA SAHAKARI BANK LTD BUDAUN, 14440=PASCHIM BANGA GRAMIN BANK, 16980=SUDHA CO OP URBAN BANK LTD, 35000=THE DAHOD MERCANTILE CO OP BANK LTD, 35120=THE AGRASEN NAGARI SAHAKARI BANK LTD, 6380=THE BURDWAN CENTRAL CO OP BANK LTD, 8560=THE DHANERA MERCANTILE CO OP BANK LTD, 16500=THE NAWANAGAR CO OP BANK LTD, 15740=GUJARAT AMBUJA CO OP BANK LTD, 15860=THE MUSLIM CO OP BANK LTD, 15980=PRIME CO OP BANK LTD, 35110=THE BAVLA NAGRIK SAHAKARI BANK LTD, 8570=NAGRIK SAHAKARI BANK MARYADHIT VIDISHA, 17920=SHREE BALAJI URBAN CO OP BANK LTD, 16840=THE FINANCIAL CO OP BANK LTD, 14420=THE JALGAON PEOPLES CO OP BANK LTD, 35100=THE BANTRA CO OP BANK LTD, 16600=RAJKOT COMMERCIAL CO OP BANK LTD, 16720=MAHARASHTRA STATE CO-OPERATIVE BANK LTD, 17810=KAVITA URBAN CO OP BANK LTD, 15960=ADV SHAMRAOJI SHINDE SATYASHODHAK BANK LTD, 15720=ARVIND SAHAKARI BANK LTD, 15840=THE UNION CO OP BANK LTD MAHINAGAR, 20070=GANDHIBAG SAHAKARI BANK LTD NAGPUR, 20190=SHRAMIK NAGRIK SAHKARI BANK LTD, 17900=THE PANDHARPUR URBAN CO OP BANK LTD, 8480=THE UDAIPUR MAHILA URBAN CO OP BANK LTD, 16700=THE MEHSANA DISTRICT CENTRAL CO OP BANK LTD, 16820=AKHAND ANAND CO OP BANK LTD, 16940=THE SIND CO OP URBAN BANK LTD, 20080=THE JAMNAGAR PEOPLES COOPERATIVE BANK LTD, 18410=THE NANDED MERCHANTS CO OP BANK LTD NANDED, 17200=THE KARNAVATI CO OP  BANK LTD, 20610=ASHOK SAHAKARI BANK LTD, 17680=URBAN CO OP BANK LTD BASTI, 17560=PATAN NAGARIK SAHAKARI BANK LTD, 17440=THE MALAD SAHAKARI BANK LTD, 19740=THE TIRUNELVELI DISTRICT CENTRAL CO OP BANK LTD, 18530=THE BIJNOR URBAN CO OP BANK LTD, 17320=THE NASIK JILHA MAHILA SAHAKARI BANK LTD, 8490=THE VAIDYANATH URBAN CO OP BANK LTD, 34900=THE MATTANCHERRY SARVAJANIK CO OP BANK LTD, 16000=THE OJHAR MERCHANTS CO OP BANK LTD, 16120=AHMEDABAD MERCANTILE CO-OPBANK LTD, 19510=THE CHITNAVISPURA SAHAKARI BANK LTD, 20620=ALMORA URBAN CO  OPERATIVE BANK LTD, 16240=THE UNAVA NAGRIK SAHAKARI BANK LTD, 20740=INDIAN BANK, 16360=VIDYA SAHAKARI BANK LTD, 20860=THE SANKHEDA NAGARIK SAHAKARI BANK LTD, 17570=JANATA SAHAKARI BANK LTD AMRAVATI, 19870=JANASEVA SAHAKRI BANK LTD PUNE, 20980=NAGARIK SAHAKARI BANK LTD BHIWANDI, 19990=THE AP MAHAJANS COOPERATIVE URBAN BANK LTD, 19630=NIlkanth Co Operative Bank Ltd, 16480=THE BAPUNAGAR MAHILA CO OP BANK LTD, 15390=SHRIKRISHNA CO OP BANK LTD UMRER, 8260=The Income Tax Dept Coop Bank Ltd, 17420=MANSING CO-OPERATIVE BANK LTD., 19720=THANE BHARAT SAHAKARI BANK LTD, 18510=THE BHAVASARA KSHATRIYA CO OP BANK LTD, 17300=THE MALLESHWARAM CO OP BANK LTD, 35090=BHEL EMPLOYEES CO OP BANK LTD, 19600=MAHARASHTRA GRAMIN BANK, 18990=Kankaria Mainagar Nagrik Sahakari Bank Ltd, 17660=MIZORAM URBAN CO OP DEVELOPMENT BANK LTD, 18870=Patan Co Op Bank Ltd, 8270=GP Parsik Sahakari Bank ltd Kalwa Thane, 16220=VISHWAS CO OP BANK LTD, 20720=THE HIMACHAL PRADESH STATE CO  OPERATIVE BANK LTD, 16340=THE VALLABH VIDYANAGAR COMMERCIAL BANK LTD, 20840=SREE CHARAN SOUHARDHA CO  OP BANK LTD, 16460=THE VERAVAL PEOPLES CO OP BANK LTD, 20960=DAPOLI URBAN CO OP BANK LTD DAPOLI, 15370=SARASPUR NAGARIK CO OP BANK LTD, 16580=PUNE PEOPLES CO OP BANK LTD, 17670=THE COMMERCIAL CO OP BANK LTD JAMNAGAR, 18880=The Banaskantha Dist Central Co Op Bank Ltd, 17550=RAJKOT PEOPLES COOPERATIVE BANK LTD, 18760=Navi Mumbai Co Op Bank Ltd, 19850=DHANALAXMI BANK, 16100=THE BHUJ MERCENTILE CO OP BANK LTD, 18640=BETUL NAGRIK SAHAKARI BANK MYDT, 19970=AGARTALA COOPERATIVE URBAN BANK LIMITED, 8280=J AND K Grameen Bank, 18850=Ramrajya Sahakari Bank Ltd, 35070=THE BARODA CENTRAL CO OP BANK LTD, 17400=Shree parswanath Co-operative Bank Ltd., 19820=SHRI BASAVESHWAR SAHAKARI BANK NYT BAGALKOT, 17880=THE MOIRANG PRIMARY CO OP BANK LTD, 18970=Dr Annasaheb Chougule Urban Co Op Bank Lt Vadgaon, 8290=DEUTSCHE BANK AG, 17530=THE GOA URBAN CO-OPERATIVE BANK LTD., 16440=SHRI CHHANI NAGRIK SAHKARI BANK LTD, 18740=THE NAV JEEVAN CO OP BANK LTD, 20940=THE SEVALIA URBAN CO  OP BANK LTD, 15350=THE SIRCILLA CO OP URBAN BANK LTD, 16560=THE SABARKANTHA DISTRICT CENTRAL CO OP BANK LTD, 18620=THE BORAL UNION CO OP BANK LTD, 19950=THE ABHINAV SAHAKARI BANK LIMITED, 16680=THE GANDEVI PEOPLES CO OP BANK LTD, 18500=THE CHAMBA URBAN CO OP BANK LTD CHAMBA, 19710=SAPTAGIRI GRAMEENA BANK, 16200=BOMBAY MERCANTILE CO OP BANK LTD, 16320=THE MODASA NAGARIK SAHKARI BANK LTD, 17650=THE SARANGPUR CO OP BANK LTD, 20700=THE ERNAKULAM DISTRICT CO  OPERATIVE BANK LTD, 20820=POORNAWADI NAGRIK SAHAKARI BANK MBEED, 35060=CHENNAI CENTRAL CO OP BANK LTD, 17860=THE NATIONAL CO OP BANK LTD BANGALORE, 15680=THE KHAMGAON URBAN CO OP BANK LTD, 17740=DR BABASAHEB AMBEDKAR SAHAKARI BANK LTD NASIK, 18950=Banda Urban Co Op Bank Ltd, 17620=ANDAMAN AND NICOBAR STATE CO OP BANK LTD, 35050=CAPITAL SMALL FINANCE BANK LTD, 4700=TAMILNAD MERCANTILE BANK LTD., 19800=BANARAS MERCHANTILE CO OPERATIVE BANK LTD, 16660=JALNA MERCHANTS CO OP BANK LTD, 16780=THE BANASKANTHA MERCANTILE CO OP BANK LTD, 17510=Nagrik Sahakari Bank Ltd Indore, 18720=OMKAR NAGREEYA SAHKARI BANK LTD, 18600=BRAMHAPURI URBAN CO OP BANK LTD, 16300=THE BHUJ COMMERCIAL CO OP BANK LTD, 16420=THE SHIRPUR PEOPLES CO OP BANK LTD, 17990=SADHANA SAHAKARI BANK LTD, 15330=THE SURAT MERCANTILE CO OP BANK LTD, 16540=THE MAHAVEER CO OP BANK LTD, 20800=LOKVIKAS NAGARI SAHAKARI BANK LTD  AURANGABAD, 35040=COLOUR MERCHANTS CO OP BANK LTD, 20920=NAGARIK SAHAKARI BANK MARYADIT DURG, 4710=THE CATHOLIC SYRIAN BANK, 5800=THE NABADWIP CO OP CREDIT BANK LTD}">
+                <div class="md-select bank-select" style="z-index:151">
+                    <label for="ul-id4"><button type="button" id="bankBtn"  class="ng-binding bankName">Select Bank</button>
+                    </label>
+                    <ul role="listbox" id="ul-id4" class="md-whiteframe-z1" aria-activedescendant="back" name="ul-id4"></ul>
+                  <p class="error_msg" id="bn_errMsg">Please select your bank.</p>
+                </div>
+            </div>  -->
+            
+								
+            <div class="form-group col-lg-6 col-md-12 error_input debitAc">
+              <label for="full_n" class="label-text">Debit Account Number*</label>
+              <div class="input-div">
+				<input id="accountNumber" name="accountNumber" th:field="*{debit_Account_number}" type="text" value="" maxlength="20"/>
+				<p class="error_msg" id="ac_errMsg">Please enter valid Debit Account Number.</p>
+              </div>
+            </div>
+
+           <div class="form-group col-lg-6 col-md-12  error_input confirmAc">
+              <label for="relation" class="label-text">Confirm Account Number*</label>
+              <div class="input-div">
+				<input id="confirmAccountNumber" th:field="*{confirm_debit_account}" name="confirmAccountNumber" type="text" value="" maxlength="20"/>
+				<p class="error_msg" id="cac_errMsg">Please enter valid Debit Account Number.</p>
+              </div>
+            </div>
+            
+            <div class="form-group dropdown-form col-lg-6">
+              <label for="relation" class="label-text">Select Account Type*</label> 
+			  <input type="hidden" name ="hideAccountType" id="hideAccountType" value="{Saving=Saving}">
+
+              <div class="md-select accountType-select">
+
+                  <label for="ul-id3">
+                    <button type="button" id="accountTypeBtn" class="ng-binding accountType">Select Account Type</button>
+                  </label>
+                  <ul role="listbox" id="ul-id3" class="md-whiteframe-z12" aria-activedescendant="account" name="ul-id3"></ul>
+                  <p class="error_msg" id="accType_errMsg">Please select your account type.</p>
+                </div>
+            </div>
+            
+            
+
+            <div class="form-group col-lg-6 error_input ifsc">
+              <label for="relation" class="label-text">Enter Bank IFSC Code*</label>
+              <div class="input-div">
+				<input id="ifscCode" name="ifscCode" th:field="*{ifsc}" placeholder="SBI0000158" type="text" class="form-input" value="" maxlength="11"/>
+				<p class="error_msg" id="ifsc_errMsg">Please enter valid IFSC Code.</p>
+              </div>
+            </div>
+        </div>
+
+          <h3 class="margin-top-label">Mandate Information</h3>
+
+          <div class="form_div row">
+            <div class="form-group col-lg-6 error_input emiAmt">
+              <label for="relation" class="label-text">Collection Amount*</label>
+              <div class="input-div">
+				<input id="emiAmount" name="emiAmount" th:field="*{collection_amt}" type="text" class="rupee" value="" maxlength="9"/>
+				<p class="error_msg" id="eamt_errMsg">Please enter Collection Amount.</p>
+              </div>
+            </div>
+								
+           <div class="form-group col-lg-6 error_input maxEmiAmt">
+              <label for="relation" class="label-text">Maximum Collection Amount*</label>
+              <div class="input-div">
+				<input id="maximumEmiAmount" name="maximumEmiAmount" th:field="*{max_coll_amt}" type="text" class="rupee" value="" maxlength="9"/>
+				<p class="error_msg" id="mamt_errMsg">Please enter  Maximum Collection Amount.</p>  
+              </div>
+            </div>
+
+            <div class="form-group dropdown-form col-lg-6 error_input">
+              <label for="select_type" class="label-text">Collection Type*</label>
+              <input type="hidden" name ="hidTname" id="hidTname" value="">
+              <div class="md-select type-select">
+                  <label for="ul-id2">
+                    <button type="button" id="typeBtn"  class="ng-binding typeName">Select Type</button>
+                  </label>
+                  <ul role="listbox" id="ul-id2" class="md-whiteframe-z1" aria-activedescendant="coll-type" name="ul-id2"></ul>
+                  <p class="error_msg" id="type_errMsg">Please select Collection Type.</p>
+                </div>
+            </div>
+            
+            
+            <div class="form-group dropdown-form col-lg-6">
+              <label for="select_freq" class="label-text">Collection Frequency*</label>
+			  <input type="hidden" name ="hidFname" id="hidFname" value="">
+
+              <div class="md-select freq-select">
+
+                  <label for="ul-id1">
+                    <button type="button" id="freqBtn"  class="ng-binding freqName">Select Frequency</button>
+                  </label>
+                  <ul role="listbox" id="ul-id1" class="md-whiteframe-z1" aria-activedescendant="coll-freq" name="ul-id1"></ul>
+                    <p class="error_msg" id="freq_errMsg">Please select Collection Frequency.</p>      
+                </div>
+                    
+              </div>
+              
+								
+
+            <div class="form-group col-lg-6 emiStart" >
+              <label for="date_start" class="label-text">Collection First Date*</label>
+              <div class="input-div">
+				<input id="datepicker_first" name="emiStartDate" th:field="*{coll_first_date}" type="text" class="date_input" value=""/>
+				<p class="error_msg" id="emiStart_errMsg" style="display:none">Please select collection first date.</p> 
+              </div>
+             
+            </div>
+            <div class="form-group col-lg-6 emiEnd">
+              <label for="date_start" class="label-text">Collection Last Date*</label>
+			  <input id="datepicker_last" name="emiEndDate" th:field="*{coll_last_date}" type="text" class="form-input" value="24-04-2054" readonly="readonly" />
+			 <p class="error_msg" id="emiend_errMsg" style="display:none">Please select collection last date.</p>
+            </div>
+          </div>
+          <!-- <label for="chkPassport" class="font-12 mt-2 blue-text pay-checkbox-label checkbox-label">
+            <input id="chkPassport" name="terms" type="checkbox" value="yes"/><input type="hidden" name="_terms" value="on"/>
+									I Accept <a href="https://www.icicibank.com/terms-condition/tnc-for-enach.page" target="_blank"> Terms & Conditions</a>
+            <span class="checkmark"></span>
+          </label>
+          <p class="error_msg" id="terms_errMsg" style="display:none;font-size: 12px;color: red;">Please select terms and conditions.</p>
+          <a href="#" class="cta authorize_btn margin-top-label deactive" id="submitMandate">Authorize Mandate</a> -->
+
+        </div>
+      </div>
+    </div>
+	<button type="submit" class="cta authorize_btn margin-top-label deactive">submitMandate</button>
+
+   				<input id="productCode" name="productCode" type="hidden" value=""/>
+			    <input id="bankName" name="bankName" type="hidden" value=""/>
+			    <input id="freqName" name="freqName" type="hidden" value=""/>
+			    <input id="emiFrequency" name="emiFrequency" type="hidden" value=""/>
+			    <input id="emiType" name="emiType" type="hidden" value=""/>
+			    <input id="typeName" name="typeName" type="hidden" value=""/>
+			    <input id="paymentType" name="paymentType" type="hidden" value=""/>
+			    <input id="acccountType" name="acccountType" type="hidden" value=""/>
+    			<input type="hidden" name="salt_id" id="salt_id"/>
+				<input type="hidden" name="vid" id="vid"/>
+			    <input type="hidden" name="qs" id="qs"/>
+    </form>
+  </section>
+  <section class="note">
+
+  </section>
+
+  <!-- <footer>
+    <img src=" images/enach/footer-image.png" alt="" class="demo-images">
+  </footer> -->
+  <!-- Optional JavaScript -->
+ <!-- older jquery  -->
+  <!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script> -->
+ 
+</body>
+
+</html>
