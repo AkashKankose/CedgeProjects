@@ -12,4 +12,6 @@ public interface Eman_Panconfig_Repo extends CrudRepository<Eman_panconfig, Inte
 	
 	public Eman_panconfig findBybankcode(String bankcode);
 
+	
+
 }

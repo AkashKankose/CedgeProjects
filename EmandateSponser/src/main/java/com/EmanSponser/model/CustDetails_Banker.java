@@ -1,42 +1,45 @@
 package com.EmanSponser.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 public class CustDetails_Banker {
 
 	@Id
-	@GeneratedValue(strategy =GenerationType.AUTO)
-	private int id;
-	private String loan_Number;
+	private String token;
+	private String creditor_Number;
 	private String name;
 	private String mobile;
-	private String email;
+//	private String email;
 	private String loan_amt;
+	private String bank;
 	private String mandate_type;//not mentioned in frontend
 	private String debit_Account_number;
 	private String confirm_debit_account;
 	private String account_type;//not mentioned.....
-	private String ifsc;
+//	private String ifsc;
 	private String collection_amt;
-	private String max_coll_amt;
-	private String frequesncy;//not mentioned
+//	private String max_coll_amt;
+	private String frequency;//not mentioned
 	private String coll_first_date;
 	private String coll_last_date;
-	public int getId() {
-		return id;
+	private LocalDateTime expirationTime;
+	public String getToken() {
+		return token;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setToken(String token) {
+		this.token = token;
 	}
-	public String getLoan_Number() {
-		return loan_Number;
+	public String getCreditor_Number() {
+		return creditor_Number;
 	}
-	public void setLoan_Number(String loan_Number) {
-		this.loan_Number = loan_Number;
+	public void setCreditor_Number(String creditor_Number) {
+		this.creditor_Number = creditor_Number;
 	}
 	public String getName() {
 		return name;
@@ -50,17 +53,17 @@ public class CustDetails_Banker {
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
 	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
 	public String getLoan_amt() {
 		return loan_amt;
 	}
 	public void setLoan_amt(String loan_amt) {
 		this.loan_amt = loan_amt;
+	}
+	public String getBank() {
+		return bank;
+	}
+	public void setBank(String bank) {
+		this.bank = bank;
 	}
 	public String getMandate_type() {
 		return mandate_type;
@@ -86,29 +89,17 @@ public class CustDetails_Banker {
 	public void setAccount_type(String account_type) {
 		this.account_type = account_type;
 	}
-	public String getIfsc() {
-		return ifsc;
-	}
-	public void setIfsc(String ifsc) {
-		this.ifsc = ifsc;
-	}
 	public String getCollection_amt() {
 		return collection_amt;
 	}
 	public void setCollection_amt(String collection_amt) {
 		this.collection_amt = collection_amt;
 	}
-	public String getMax_coll_amt() {
-		return max_coll_amt;
+	public String getFrequency() {
+		return frequency;
 	}
-	public void setMax_coll_amt(String max_coll_amt) {
-		this.max_coll_amt = max_coll_amt;
-	}
-	public String getFrequesncy() {
-		return frequesncy;
-	}
-	public void setFrequesncy(String frequesncy) {
-		this.frequesncy = frequesncy;
+	public void setFrequency(String frequency) {
+		this.frequency = frequency;
 	}
 	public String getColl_first_date() {
 		return coll_first_date;
@@ -122,40 +113,46 @@ public class CustDetails_Banker {
 	public void setColl_last_date(String coll_last_date) {
 		this.coll_last_date = coll_last_date;
 	}
+	public LocalDateTime getExpirationTime() {
+		return expirationTime;
+	}
+	public void setExpirationTime(LocalDateTime expirationTime) {
+		this.expirationTime = expirationTime;
+	}
 	@Override
 	public String toString() {
-		return "CustDetails_Banker [id=" + id + ", loan_Number=" + loan_Number + ", name=" + name + ", mobile=" + mobile
-				+ ", email=" + email + ", loan_amt=" + loan_amt + ", mandate_type=" + mandate_type
+		return "CustDetails_Banker [token=" + token + ", creditor_Number=" + creditor_Number + ", name=" + name
+				+ ", mobile=" + mobile + ", loan_amt=" + loan_amt + ", bank=" + bank + ", mandate_type=" + mandate_type
 				+ ", debit_Account_number=" + debit_Account_number + ", confirm_debit_account=" + confirm_debit_account
-				+ ", account_type=" + account_type + ", ifsc=" + ifsc + ", collection_amt=" + collection_amt
-				+ ", max_coll_amt=" + max_coll_amt + ", frequesncy=" + frequesncy + ", coll_first_date="
-				+ coll_first_date + ", coll_last_date=" + coll_last_date + "]";
+				+ ", account_type=" + account_type + ", collection_amt=" + collection_amt + ", frequency=" + frequency
+				+ ", coll_first_date=" + coll_first_date + ", coll_last_date=" + coll_last_date + ", expirationTime="
+				+ expirationTime + "]";
 	}
-	public CustDetails_Banker(int id, String loan_Number, String name, String mobile, String email, String loan_amt,
-			String mandate_type, String debit_Account_number, String confirm_debit_account, String account_type,
-			String ifsc, String collection_amt, String max_coll_amt, String frequesncy, String coll_first_date,
-			String coll_last_date) {
+	public CustDetails_Banker(String token, String creditor_Number, String name, String mobile, String loan_amt,
+			String bank, String mandate_type, String debit_Account_number, String confirm_debit_account,
+			String account_type, String collection_amt, String frequency, String coll_first_date, String coll_last_date,
+			LocalDateTime expirationTime) {
 		super();
-		this.id = id;
-		this.loan_Number = loan_Number;
+		this.token = token;
+		this.creditor_Number = creditor_Number;
 		this.name = name;
 		this.mobile = mobile;
-		this.email = email;
 		this.loan_amt = loan_amt;
+		this.bank = bank;
 		this.mandate_type = mandate_type;
 		this.debit_Account_number = debit_Account_number;
 		this.confirm_debit_account = confirm_debit_account;
 		this.account_type = account_type;
-		this.ifsc = ifsc;
 		this.collection_amt = collection_amt;
-		this.max_coll_amt = max_coll_amt;
-		this.frequesncy = frequesncy;
+		this.frequency = frequency;
 		this.coll_first_date = coll_first_date;
 		this.coll_last_date = coll_last_date;
+		this.expirationTime = expirationTime;
 	}
 	public CustDetails_Banker() {
 		super();
 	}
+	
 	
 	
 }

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="javax.validation.constraints.NotNull"/>
-    <fullyQualifiedTypeName name="javax.validation.constraints.NotBlank"/>
     <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RestController"/>
     <fullyQualifiedTypeName name="java.util.logging.Logger"/>
     <fullyQualifiedTypeName name="javax.validation.Valid"/>
@@ -31,7 +29,6 @@
     <fullyQualifiedTypeName name="com.PanCard.ema.DbEntity.eman_adharconfig"/>
     <fullyQualifiedTypeName name="java.io.Serializable"/>
     <fullyQualifiedTypeName name="com.PanCard.ema.Model.ReqFromNPCI"/>
-    <fullyQualifiedTypeName name="com.PanCard.ema.DbEntity.Eman_panconfig"/>
     <fullyQualifiedTypeName name="com.PanCard.ema.Util.XmlValidatior"/>
     <fullyQualifiedTypeName name="com.PanCard.ema.Model.XmlRequestModel"/>
     <fullyQualifiedTypeName name="com.PanCard.ema.ResponseModel.MandateRejectDtl"/>
@@ -60,4 +57,7 @@
     <fullyQualifiedTypeName name="org.springframework.boot.autoconfigure.amqp.RabbitProperties.Cache.Connection"/>
     <fullyQualifiedTypeName name="java.sql.Connection"/>
     <fullyQualifiedTypeName name="com.cedge.adhaarcardapi.dao.MandateMasterDao"/>
+    <fullyQualifiedTypeName name="com.PanCard.ema.DbEntity.Eman_panconfig"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.ModelAttribute"/>
+    <fullyQualifiedTypeName name="java.lang.Math"/>
 </qualifiedTypeNameHistroy>

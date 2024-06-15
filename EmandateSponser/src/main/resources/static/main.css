@@ -2,7 +2,6 @@ body {
     -webkit-font-smoothing: antialiased;
     font-family: 'Helvetica';
     background-color: white; }
-  
   .wrapper {
     background: white;
     box-shadow: 0 4px 5px rgba(102, 102, 102, 0.8);
@@ -26,7 +25,8 @@ body {
         margin: 0; } }
     @media (min-width: 768px) and (max-width: 1025px) {
       .container .row {
-        margin: 0; } }
+        margin: 0;
+ } }
   
   .detail-col .sub-text {
     font-size: 0.875rem;
@@ -36,10 +36,10 @@ body {
         font-size: 0.75rem;
         padding-top: 0.5rem; } }
   .detail-col .para-link {
-    color: #F27B1A;
+    color: #000080;
     cursor: pointer; }
     .detail-col .para-link:hover {
-      color: #F27B1A; }
+      color: #000080; }
   .detail-col .dropdown-el {
     min-width: auto;
     position: absolute;
@@ -217,7 +217,7 @@ body {
     padding: 0;
     width: 100%; }
   .mandate_page .top-bar {
-    background-color: #f5821f;
+    background-color: #000080;
     height: 62px;
     margin: 0; }
     @media (max-width: 767px) {
@@ -319,7 +319,7 @@ body {
       float: left; } }
   
   .cta {
-    background-color: #F27B1A;
+    background-color: #000080;
     position: relative;
     font-size: 14px;
     font-weight: bold;
@@ -327,7 +327,7 @@ body {
     line-height: 2rem;
     letter-spacing: 0.46px;
     text-align: center;
-    width: 8rem;
+    /*width: 8rem;*/
     height: 2.5rem;
     display: flex;
     justify-content: center;
@@ -346,12 +346,12 @@ body {
       text-decoration: none; }
       @media (max-width: 767px) {
         .cta:hover {
-          background-color: #F27B1A; } }
+          background-color: #000080; } }
   
   .cta-invert {
     background: white;
-    border: 2px solid #F27B1A;
-    color: #F27B1A !important; }
+    border: 2px solid #000080;
+    color: #000080 !important; }
     .cta-invert:hover {
       border: none;
       color: white !important; }
@@ -374,7 +374,7 @@ body {
         .mandate_page .detail-col .detail_div {
           width: 80%; } }
       .mandate_page .detail-col .detail_div .cta {
-        border: 2px solid #F27B1A;
+        border: 2px solid #000080;
         padding: 2rem;
         font-size: 18px;
         width: 14rem; }
@@ -384,7 +384,7 @@ body {
         .mandate_page .detail-col .detail_div .cta:hover {
           border: 2px solid #FFA117 !important; }
       .mandate_page .detail-col .detail_div .cta-invert {
-        border: 2px solid #F27B1A !important; }
+        border: 2px solid #000080 !important; }
         .mandate_page .detail-col .detail_div .cta-invert:hover {
           border: 2px solid #FFA117 !important; }
       .mandate_page .detail-col .detail_div h4 {
@@ -398,8 +398,12 @@ body {
       margin-bottom: 0.5rem;
       display: flex; }
       @media (max-width: 767px) {
-        .mandate_page .detail-col .form_div .form-group {
-          display: block; } }
+         
+          .mandate_page .detail-col .form_div .form-group{
+			  display: block;
+        padding: 0;
+		  }
+          }
       .mandate_page .detail-col .form_div .form-group .label-text {
         width: 13rem;
         font-size: 14px;
@@ -414,9 +418,17 @@ body {
         font-size: 12px;
         color: #004981;
         width: 13rem; }
+        .mandate_page .detail-col .form_div .form-group select {
+        font-size: 12px;
+        color: #004981;
+         }
         @media (max-width: 767px) {
           .mandate_page .detail-col .form_div .form-group input {
-            width: 85%; } }
+            width: 100% !important; }
+            .mandate_page .detail-col .form_div .form-group select {
+            width: 100% !important; }
+            .mandate_page .detail-col .form_div .form-group button {
+            width: 100% !important; } }
       .mandate_page .detail-col .form_div .form-group .acc {
         width: 13rem; }
         @media (max-width: 767px) {
@@ -453,15 +465,28 @@ body {
         @media (min-width: 1025px) {
           .mandate_page .detail-col .form_div .dropdown-form .label-text {
             display: flex;
-            align-items: center; } }
+            /*align-items: center;*/ } }
         @media (max-width: 767px) {
           .mandate_page .detail-col .form_div .dropdown-form .label-text {
             margin-top: 0; } }
+            
       .mandate_page .detail-col .form_div .dropdown-form .dropdown-bank {
         width: 17rem; }
         @media (max-width: 767px) {
           .mandate_page .detail-col .form_div .dropdown-form .dropdown-bank {
             width: 85%; } }
+            
+            
+/*       auth-mode     */
+
+
+ .mandate_page .detail-col .form_div .dropdown-form .dropdown-auth {
+        width: 17rem; }
+        @media (max-width: 767px) {
+          .mandate_page .detail-col .form_div .dropdown-form .dropdown-auth {
+            width: 85%; } }
+
+/* auth mode */            
       .mandate_page .detail-col .form_div .dropdown-form .dropdown_acc_type {
         width: 13rem; }
         @media (max-width: 767px) {
@@ -553,7 +578,7 @@ body {
     background-color: #FEF5EF !important;
     background-image: none !important; }
   .mandate_page .datepicker table tr td.active.active {
-    background-color: #F27B1A !important;
+    background-color: #000080 !important;
     background-image: none !important; }
   @media (max-width: 767px) {
     .mandate_page .datepicker-dropdown.datepicker-orient-left:before {
@@ -598,7 +623,7 @@ body {
     padding: 0 1rem 0 0; }
     @media (max-width: 767px) {
       .mandate_page .main-section .detail-col {
-        padding: 0 2rem; } }
+        padding: 0 0.5rem !important; } }
     @media (min-width: 768px) and (max-width: 1025px) {
       .mandate_page .main-section .detail-col {
         padding: 0 3rem; } }
@@ -615,9 +640,22 @@ body {
       border: 1px solid transparent;
       -webkit-appearance: none;
       letter-spacing: 0.08px; }
+      .mandate_page .main-section .detail-col select {
+      box-shadow: 0 2px 5px 0 rgba(113, 113, 113, 0.39) !important;
+      -moz-box-shadow: 0 2px 5px 0 rgba(113, 113, 113, 0.39);
+      -webkit-box-shadow: 0 2px 5px 0 rgba(113, 113, 113, 0.39);
+      border-radius: 5px;
+      border: none;
+      padding: 0.5rem 1rem;
+      color: #4A4A4A;
+      font-size: 12px;
+      width: 13rem;
+      border: 1px solid transparent;
+      /*-webkit-appearance: none;*/
+      letter-spacing: 0.08px; }
       .mandate_page .main-section .detail-col input:focus {
         outline: none;
-        border: 1px solid #F27B1A;
+        border: 1px solid #000080;
         background-color: #FFFFF9; }
     .mandate_page .main-section .detail-col ::placeholder {
       color: #AFAFAF;
@@ -630,7 +668,7 @@ body {
       /* Microsoft Edge */
       color: #AFAFAF; }
     .mandate_page .main-section .detail-col h3 {
-      color: #F27B1A;
+      color: #000080;
       font-size: 20px;
       font-weight: bold; }
     .mandate_page .main-section .detail-col .tab-content .tab-pane {
@@ -667,7 +705,7 @@ body {
       content: '';
       width: 10px;
       height: 10px;
-      background: #F27B1A;
+      background: #000080;
       position: absolute;
       top: 4px;
       left: 4px;
@@ -756,13 +794,32 @@ body {
     border-radius: 0.25em;
     box-shadow: 0 2px 5px 0 rgba(113, 113, 113, 0.39) !important;
   }
+  button.cta.authorize_btn.margin-top-label.deactive {
+    border: none;
+    background:#000080;
+    margin-top: 40px;
+    padding-left:15px;
+    padding-right: 15px;
+}
+.heading{
+  color: #fff;
+  float: left;
+  margin-top: 5px;
+  margin-left: 25px;
+}
     @media (max-width: 767px) {
       .md-select [type=button] {
         width: 92%;
   
       }
+      button.cta.authorize_btn.margin-top-label.deactive {
+    border: none;
+    background:#000080;
+    margin-top: 40px;
+    padding: 0;
+}
       .md-select label {
-        width: 92%;
+        width: 100%;
   
       }
     }
@@ -846,7 +903,7 @@ body {
     background-color: #cbcfd1;
   }
   .activate{
-    background-color: #F27B1A;
+    background-color: #000080;
   }
   body .checkbox-label {
     display: block;
@@ -986,16 +1043,69 @@ body {
    .input-div{
     width: 13rem;
   }
+  .card-details input{
+    margin-bottom: 10px;
+    width: 100% !important;
+  }
+  .card-details {
+    column-gap: 15px;
+    row-gap: 10px;
+}
+#cvv{
+  width:33.30% !important;
+}
+#mm{
+  width:30% !important;
+}
+#yyyy{
+  width:32% !important;
+}
+@media only screen and (min-width:992px){
+
+  div.aadhar-input, div.debit-card-input{
+    display: none;
+  }
+  /*.aadhar-input{
+      display: flex;
+    padding: 0;
+    }
+    .debit-card-input{
+      display: flex;
+      padding: 0;
+    }*/
   
+}
   /* 10th august */
-  @media (max-width: 767px) {
+  @media only screen and (max-width: 767px) {
     .input-div{
       width: 100%;
     }
+   .aadhar-input{
+      display: none;
+    }
+    .debit-card-input{
+      display: none;
+    }
+    #cvv{
+  width:35.30% !important;
+}
+#mm{
+  width:30% !important;
+}
+#yyyy{
+  width:32% !important;
+}
+    .mandate_page .main-section .container {
+    padding: 15px !important;
+}
+.container .row{
+	width:100%;
+}
    /*  .payment-select{
       z-index: 190;
     } */
     .md-select ul[role=listbox] {
       width: 85%;
   
+    }
     }

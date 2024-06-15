@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.EmanSponser.model.CustDetails_Banker;
 import com.EmanSponser.repository.CustDetails_banker_Repo;
+import com.EmanSponser.service.CustDetailsService;
 
 
 @Controller
@@ -18,7 +19,7 @@ public class MainController {
     private  static final Logger logger = Logger.getLogger(MainController.class);
 
     @Autowired
-    public CustDetails_banker_Repo repo;
+    private CustDetailsService custdtl;
 	
 	@GetMapping("/SaveCustData")
 	public String index(Model model)
@@ -32,7 +33,7 @@ public class MainController {
 	public String index1(CustDetails_Banker custDetails)
 	{
 		logger.info("hiting.....");
-        repo.save(custDetails);
+		custdtl.custdetails(custDetails);
         logger.info("data inserted into db....");
 		return "redirect:SaveCustData";
 	}
